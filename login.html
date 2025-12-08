@@ -35,6 +35,11 @@
                     <label>كلمة السر</label>
                     <input type="password" id="password" class="form-input" placeholder="••••••••" required>
                 </div>
+
+                <!-- Forgot Password Link -->
+                <div style="text-align: left; margin-bottom: 1rem;">
+                    <a href="#" id="forgotPasswordBtn" style="color: var(--primary-blue); font-size: 0.9rem;">نسيت كلمة السر؟</a>
+                </div>
                 
                 <button type="submit" class="btn-primary" style="width: 100%;">ادخل القهوة</button>
                 <div id="loginMessage" style="margin-top: 1rem; text-align: center;"></div>
@@ -46,9 +51,30 @@
         </div>
     </div>
 
+    <!-- Password Reset Modal -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-modal" id="closeResetModal">&times;</span>
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <i class="fa-solid fa-key" style="font-size: 2rem; color: var(--primary-blue); margin-bottom: 10px;"></i>
+                <h2 style="color: var(--primary-blue);">استعادة كلمة السر</h2>
+                <p style="font-size: 0.9rem; color: var(--text-grey);">دخل الإيميل بتاعك وهنبعتلك لينك تغير منه الباسورد.</p>
+            </div>
+            
+            <div class="form-group" style="text-align: right;">
+                <label>الإيميل</label>
+                <input type="email" id="resetEmail" class="form-input" placeholder="name@example.com">
+            </div>
+            
+            <button id="confirmResetBtn" class="btn-primary" style="width: 100%;">ابعت اللينك</button>
+            <div id="resetMessage" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+        </div>
+    </div>
+
     <script type="module">
-        import { login } from './auth-service.js';
+        import { login, resetPassword } from './auth-service.js';
         
+        // Login Logic
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -69,6 +95,62 @@
                 messageDiv.textContent = 'فيه مشكلة في الدخول: ' + result.error;
             }
         });
+
+        // Reset Password Modal Logic
+        const modal = document.getElementById('resetModal');
+        const btn = document.getElementById('forgotPasswordBtn');
+        const closeBtn = document.getElementById('closeResetModal');
+        const confirmBtn = document.getElementById('confirmResetBtn');
+        const resetMsg = document.getElementById('resetMessage');
+
+        btn.onclick = (e) => {
+            e.preventDefault();
+            // Pre-fill email if user typed it in login
+            const loginEmail = document.getElementById('email').value;
+            if(loginEmail) document.getElementById('resetEmail').value = loginEmail;
+            
+            modal.style.display = "flex"; // Changed from block to flex to center it
+            resetMsg.textContent = "";
+        }
+
+        closeBtn.onclick = () => {
+            modal.style.display = "none";
+        }
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        confirmBtn.onclick = async () => {
+            const email = document.getElementById('resetEmail').value;
+            if (!email) {
+                resetMsg.style.color = 'red';
+                resetMsg.textContent = "اكتب الإيميل الأول يا كبير";
+                return;
+            }
+
+            resetMsg.style.color = 'var(--text-grey)';
+            resetMsg.textContent = "جاري الإرسال...";
+            confirmBtn.disabled = true;
+
+            const result = await resetPassword(email);
+
+            if (result.success) {
+                resetMsg.style.color = 'green';
+                resetMsg.textContent = "تم الإرسال! شيك على الإيميل بتاعك (ممكن يكون في السبام)";
+                setTimeout(() => {
+                    modal.style.display = "none";
+                    confirmBtn.disabled = false;
+                    resetMsg.textContent = "";
+                }, 3000);
+            } else {
+                resetMsg.style.color = 'red';
+                resetMsg.textContent = "حصل مشكلة: " + result.error;
+                confirmBtn.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>

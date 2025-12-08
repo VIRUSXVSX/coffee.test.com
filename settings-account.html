@@ -65,6 +65,7 @@
                 
                 <h1 style="margin-bottom:1.5rem; color: var(--primary-blue);">تعديل بياناتك</h1>
 
+                <!-- Personal Info Section -->
                 <div class="settings-section">
                     <h2><i class="fa-solid fa-id-card"></i> البيانات الشخصية</h2>
                     <form id="personalInfoForm">
@@ -103,6 +104,17 @@
                     </form>
                 </div>
 
+                <!-- Security Section (New) -->
+                <div class="settings-section">
+                    <h2><i class="fa-solid fa-shield-halved"></i> الأمان والخصوصية</h2>
+                    <p style="color: var(--text-grey); margin-bottom: 1rem;">عايز تغير الباسورد عشان نسيتوا ولا عشان خايف من المدام؟ 😉</p>
+                    
+                    <button class="btn-outline" id="triggerPasswordModal" style="width: 100%; text-align: right; display: flex; justify-content: space-between; align-items: center;">
+                        <span><i class="fa-solid fa-key"></i> تغيير كلمة السر</span>
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                </div>
+
                 <!-- Danger Zone -->
                 <div class="settings-section" style="border: 1px solid #c5221f;">
                     <h2 style="color: #c5221f;">
@@ -118,6 +130,7 @@
                         </button>
                     </div>
                 </div>
+                
             </main>
         </div>
     </div>
@@ -127,7 +140,6 @@
         <div class="modal-content" style="text-align: right;">
             <div class="modal-header">
                 <h3>غير صورتك يا معلم</h3>
-                <!-- <span class="close">&times;</span> -->
             </div>
             <div class="modal-body">
                 <div id="imageGrid" class="image-grid">
@@ -141,12 +153,42 @@
         </div>
     </div>
 
+    <!-- Password Modal (Funny) -->
+    <div id="passwordModal" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: right;">
+            <div class="modal-header">
+                <h3 style="color: var(--primary-blue);"><i class="fa-solid fa-user-secret"></i> عملية سرية للغاية</h3>
+                <!-- <span class="close" id="closePassModal" style="margin-left: 0; margin-right: auto;">&times;</span> -->
+            </div>
+            <div class="modal-body">
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label>الباسورد القديم <small>(اللي اتفضح 😂)</small></label>
+                        <input type="password" id="oldPassword" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>الباسورد الجديد <small>(اللي هتنساه كمان يومين)</small></label>
+                        <input type="password" id="newPassword" class="form-input" placeholder="••••••••" required>
+                    </div>
+                    
+                    <div id="passwordMsg" style="text-align: center; margin-bottom: 1rem; font-size: 0.9rem;"></div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn-outline" id="cancelPass" style="flex: 1;">خلاص كبرنا</button>
+                        <button type="submit" class="btn-primary" style="flex: 1;">غير يا باشا</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Account Modal -->
     <div id="deleteModal" class="modal" style="display: none;">
         <div class="modal-content" style="text-align: right;">
             <div class="modal-header">
                 <h2 style="color: #c5221f;">هتمسح الحساب بجد؟</h2>
-                <span class="close" style="margin-left: 0; margin-right: auto;">&times;</span>
+                <!-- <span class="close" style="margin-left: 0; margin-right: auto;">&times;</span> -->
             </div>
             <div class="modal-body">
                 <p>عشان تتأكد، اكتب كلمة "<b>امسح</b>" في المربع ده:</p>
@@ -166,4 +208,5 @@
     <script type="module" src="settings-account.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>

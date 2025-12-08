@@ -3,7 +3,8 @@ import {
     onAuthStateChanged, 
     getUserData, 
     updateUserProfile, 
-    deleteUserAccount 
+    deleteUserAccount,
+    changeUserPassword // <--- Imported
 } from './auth-service.js';
 
 // Predefined profile images
@@ -71,7 +72,7 @@ function updateUI() {
 
     const firstNameInput = document.getElementById('firstName');
     const lastNameInput = document.getElementById('lastName');
-    const bioInput = document.getElementById('userBio'); // <--- Bio Input
+    const bioInput = document.getElementById('userBio'); 
     const emailInput = document.getElementById('email');
     const eduInput = document.getElementById('educationLevel');
 
@@ -106,13 +107,38 @@ function setupEventListeners() {
 
     const cancelImgBtn = document.getElementById('cancelImageSelect');
     const confirmImgBtn = document.getElementById('confirmImageSelect');
-    const closeImgIcon = document.querySelector('#imageModal .close');
+    const closeImgIcon = document.querySelector('#imageModal .close'); // Deprecated if using new modal style, but kept for safety
 
     if(cancelImgBtn) cancelImgBtn.addEventListener('click', closeImageModal);
-    if(closeImgIcon) closeImgIcon.addEventListener('click', closeImageModal);
     if(confirmImgBtn) confirmImgBtn.addEventListener('click', saveNewProfileImage);
 
-    // 3. Delete Modal Triggers
+    // 3. Password Modal Triggers (NEW)
+    const triggerPassBtn = document.getElementById('triggerPasswordModal');
+    const passModal = document.getElementById('passwordModal');
+    const closePassBtn = document.getElementById('closePassModal');
+    const cancelPassBtn = document.getElementById('cancelPass');
+    const passForm = document.getElementById('changePasswordForm');
+
+    if (triggerPassBtn) {
+        triggerPassBtn.addEventListener('click', () => {
+            passModal.style.display = 'flex';
+            document.getElementById('passwordMsg').textContent = '';
+            passForm.reset();
+        });
+    }
+
+    const closePassModal = () => passModal.style.display = 'none';
+    if (closePassBtn) closePassBtn.addEventListener('click', closePassModal);
+    if (cancelPassBtn) cancelPassBtn.addEventListener('click', closePassModal);
+
+    if (passForm) {
+        passForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handlePasswordChange();
+        });
+    }
+
+    // 4. Delete Modal Triggers
     const deleteBtn = document.getElementById('deleteAccountBtn');
     if (deleteBtn) deleteBtn.addEventListener('click', setupDeleteAccount);
 
@@ -120,9 +146,49 @@ function setupEventListeners() {
     window.onclick = (e) => {
         const imgModal = document.getElementById('imageModal');
         const delModal = document.getElementById('deleteModal');
+        const pwdModal = document.getElementById('passwordModal');
+        
         if (e.target == imgModal) closeImageModal();
-        if (e.target == delModal) document.getElementById('deleteModal').style.display = 'none';
+        if (e.target == delModal) delModal.style.display = 'none';
+        if (e.target == pwdModal) pwdModal.style.display = 'none';
     };
+}
+
+// --- Password Change Logic (NEW) ---
+async function handlePasswordChange() {
+    const oldPass = document.getElementById('oldPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const msgDiv = document.getElementById('passwordMsg');
+    const btn = document.querySelector('#changePasswordForm button[type="submit"]');
+
+    if (newPass.length < 6) {
+        msgDiv.style.color = 'red';
+        msgDiv.textContent = 'الباسورد قصير أوي يا كابتن (على الأقل 6 حروف)';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'جاري التشفير...';
+    msgDiv.style.color = 'var(--text-grey)';
+    msgDiv.textContent = 'لحظة واحدة...';
+
+    const result = await changeUserPassword(oldPass, newPass);
+
+    if (result.success) {
+        msgDiv.style.color = 'green';
+        msgDiv.textContent = 'تمام يا ريس! الباسورد اتغير بنجاح';
+        btn.textContent = 'تم!';
+        setTimeout(() => {
+            document.getElementById('passwordModal').style.display = 'none';
+            btn.disabled = false;
+            btn.textContent = 'غير يا باشا';
+        }, 2000);
+    } else {
+        msgDiv.style.color = 'red';
+        msgDiv.textContent = 'مشكلة: ' + result.error;
+        btn.disabled = false;
+        btn.textContent = 'غير يا باشا';
+    }
 }
 
 // --- Image Logic ---
@@ -190,14 +256,14 @@ async function savePersonalInfo() {
 
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
-    const bio = document.getElementById('userBio').value.trim(); // <--- Get Bio
+    const bio = document.getElementById('userBio').value.trim(); 
     const educationLevel = document.getElementById('educationLevel').value;
     
     const fullName = `${firstName} ${lastName}`.trim();
 
     const result = await updateUserProfile({
         fullName: fullName,
-        bio: bio, // <--- Save Bio
+        bio: bio,
         educationLevel: educationLevel
     });
 
@@ -205,7 +271,7 @@ async function savePersonalInfo() {
         alert('تسلم ايدك، البيانات اتحدثت!');
         userData.fullName = fullName;
         userData.educationLevel = educationLevel;
-        userData.bio = bio; // Update local data
+        userData.bio = bio; 
         updateUI();
     } else {
         alert('مشكلة في الحفظ: ' + result.error);
@@ -255,5 +321,5 @@ function setupDeleteAccount() {
 
     const closeModal = () => modal.style.display = 'none';
     cancelBtn.onclick = closeModal;
-    closeBtn.onclick = closeModal;
+    if(closeBtn) closeBtn.onclick = closeModal;
 }

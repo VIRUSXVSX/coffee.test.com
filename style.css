@@ -926,7 +926,6 @@ selector::-webkit-scrollbar-thumb:hover {
     padding-top: 15px;
     display: none; /* Hidden by default */
     background: rgba(0,0,0,0.02);
-    background-color: var(--bg-card);
     padding: 15px;
     border-radius: 0 0 var(--radius) var(--radius);
 }
