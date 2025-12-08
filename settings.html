@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - الإعدادات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-layout">
+            
+<aside class="profile-sidebar">
+                <div class="profile-image-container">
+                    <img id="profileImage" src="images/user.png" alt="Profile" class="profile-img-lg">
+                </div>
+                
+                <h2 id="userName" style="color: var(--primary-blue);">جاري التحميل...</h2>
+                <p id="userEducation" style="font-weight: bold;">زبون جديد</p>
+                <p id="userEmail" style="font-size:0.9rem; color:var(--text-grey); margin-bottom: 1rem;">...</p>
+                
+                <ul class="profile-menu">
+                    <li onclick="window.location.href='profile.html'">
+                        <i class="fa-solid fa-mug-hot"></i> مشاريب نزلتها
+                    </li>
+                    <li class="active" onclick="window.location.href='settings.html'">
+                        <i class="fa-solid fa-cog"></i> الإعدادات
+                    </li>
+                    <li id="logoutBtn" style="color: #c5221f; border-top: 1px solid var(--border-color);">
+                        <i class="fa-solid fa-person-walking-arrow-right"></i> أقوم أمشي
+                    </li>
+                </ul>
+            </aside>
+
+            <main>
+                <div style="margin-bottom:1rem; color:var(--text-grey);">
+                    <span style="cursor:pointer" onclick="window.location.href='profile.html'">الملف الشخصي</span> / 
+                    <span style="color: var(--primary-blue);">الإعدادات</span>
+                </div>
+                
+                <h1 style="margin-bottom:1.5rem; color: var(--primary-blue);">إعدادات القهوة</h1>
+
+                <!-- Appearance Section -->
+                <!-- <div class="settings-section">
+                    <h2><i class="fa-solid fa-paint-brush"></i> المظهر والديكور</h2>
+                    <p style="color: var(--text-grey); margin-bottom: 1rem;">اختار الإضاءة اللي تريح عينك وانت قاعد.</p>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-outline" onclick="setTheme('light')" id="btn-light" style="flex:1;">
+                            <i class="fa-solid fa-sun"></i> نهار (فاتح)
+                        </button>
+                        <button class="btn-outline" onclick="setTheme('dark')" id="btn-dark" style="flex:1;">
+                            <i class="fa-solid fa-moon"></i> سهرة (غامق)
+                        </button>
+                    </div>
+                </div> -->
+<div class="settings-section">
+    <h2><i class="fa-solid fa-paint-brush"></i> المظهر والديكور</h2>
+    <p style="color: var(--text-grey); margin-bottom: 1rem;">اختار الإضاءة اللي تريح عينك وانت قاعد.</p>
+    
+    <div style="display: flex; gap: 10px;">
+        <button class="btn-outline" onclick="setTheme('light')" id="btn-light" style="flex:1;">
+            <i class="fa-solid fa-sun"></i> نهار (فاتح)
+        </button>
+        <button class="btn-outline" onclick="setTheme('dark')" id="btn-dark" style="flex:1;">
+            <i class="fa-solid fa-moon"></i> سهرة (غامق)
+        </button>
+        <button class="btn-outline" onclick="setTheme('system')" id="btn-system" style="flex:1;">
+            <i class="fa-solid fa-desktop"></i> تلقائي (النظام)
+        </button>
+    </div>
+</div>
+                <!-- About Section -->
+                <div class="settings-section">
+                    <h2><i class="fa-solid fa-circle-info"></i> عن القهوة</h2>
+                    
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <div style="width: 200px; height: 200px; margin: 0 auto 1rem; border-radius: 50%; overflow: hidden;">
+                             <img src="images/logo1.png" style="width: 100%; height: 100%; object-fit: cover;" alt="">
+                        </div>
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary-blue);">
+                            القهوة <span style="font-size: 0.8rem; background: var(--tag-bg); padding: 2px 8px; border-radius: 10px;">v1.0</span>
+                        </h3>
+                        <p style="color: var(--text-grey); max-width: 400px; margin: 0 auto;">
+                            أول قهوة إلكترونية في مصر.. مكانك عشان تفك عن نفسك وتشارك همومك وأفراحك مع ناس رايقة زيك.
+                        </p>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="profile-load.js"></script>
+    <script type="module" src="settings.js"></script> 
+    
+    <script src="script.js"></script>
+</body>
+</html>

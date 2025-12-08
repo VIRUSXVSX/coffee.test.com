@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - إعدادات الحساب</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="settings-account.html" class="active">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-layout">
+            
+            <aside class="profile-sidebar">
+                <div style="position: relative; display: inline-block; margin-bottom: 1rem;">
+                    <img id="sidebarImage" src="images/user.png" alt="Profile" class="profile-img-lg">
+                    <button type="button" id="triggerImageModal" style="position: absolute; bottom: 0; left: 0; background: var(--primary-blue); color: white; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border: 2px solid white; cursor: pointer;">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                </div>
+                
+                <h2 id="sidebarName">جاري التحميل...</h2>
+                <p id="sidebarEducation">...</p>
+                
+                <button class="btn-outline" style="width:100%; margin-top: 1rem; margin-bottom: 1rem;" onclick="window.location.href='profile.html'">
+                    <i class="fa-solid fa-user"></i> عرض الملف الشخصي
+                </button>
+
+                <ul class="profile-menu">
+                    <li onclick="window.location.href='profile.html'">
+                        <i class="fa-solid fa-mug-hot"></i> مشاريب نزلتها
+                    </li>
+                    <li class="active" onclick="window.location.href='settings-account.html'">
+                        <i class="fa-solid fa-user-gear"></i> بيانات الحساب
+                    </li>
+                    <li onclick="window.location.href='settings.html'">
+                        <i class="fa-solid fa-cog"></i> الإعدادات
+                    </li>
+                </ul>
+            </aside>
+
+            <main>
+                <div style="margin-bottom:1rem; color:var(--text-grey);">
+                    <span style="cursor:pointer" onclick="window.location.href='profile.html'">الملف الشخصي</span> / 
+                    <span style="color: var(--primary-blue);">بيانات الحساب</span>
+                </div>
+                
+                <h1 style="margin-bottom:1.5rem; color: var(--primary-blue);">تعديل بياناتك</h1>
+
+                <div class="settings-section">
+                    <h2><i class="fa-solid fa-id-card"></i> البيانات الشخصية</h2>
+                    <form id="personalInfoForm">
+                        <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0;">
+                            <div class="form-group">
+                                <label for="firstName">الاسم الأول</label>
+                                <input type="text" id="firstName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">اسم العيلة (اللقب)</label>
+                                <input type="text" id="lastName" class="form-input">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="userBio">نبذة عنك (Bio)</label>
+                            <textarea id="userBio" class="form-input" rows="3" placeholder="اكتب كلمتين عن نفسك..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">الإيميل</label>
+                            <input type="email" id="email" class="form-input" disabled style="cursor: not-allowed; opacity: 0.7; background: #eee;">
+                        </div>
+                        <div class="form-group">
+                            <label for="educationLevel">وظيفتك / دراستك</label>
+                            <select id="educationLevel" class="form-input" required>
+                                <option value="طالب">طالب (لسه بدرس)</option>
+                                <option value="خريج">خريج (بشقى)</option>
+                                <option value="صنايعي">صنايعي (أسطى)</option>
+                                <option value="أخرى">حاجة تانية</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fa-solid fa-save"></i> حفظ التعديلات
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-section" style="border: 1px solid #c5221f;">
+                    <h2 style="color: #c5221f;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> منطقة الخطر
+                    </h2>
+                    <div>
+                        <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">مسح الحساب نهائياً</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-grey); margin-bottom: 1rem;">
+                            لو مسحت حسابك مش هتعرف ترجعه تاني، وكل مشاريبك وتاريخك على القهوة هيتمسح.
+                        </p>
+                        <button class="btn-outline" id="deleteAccountBtn" style="color: #c5221f; border-color: #c5221f;">
+                            <i class="fa-solid fa-trash"></i> امسح الحساب
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Image Selection Modal -->
+    <div id="imageModal" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: right;">
+            <div class="modal-header">
+                <h3>غير صورتك يا معلم</h3>
+                <!-- <span class="close">&times;</span> -->
+            </div>
+            <div class="modal-body">
+                <div id="imageGrid" class="image-grid">
+                    <!-- Images inserted by JS -->
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                    <button class="btn-outline" id="cancelImageSelect" style="flex: 1;">إلغاء</button>
+                    <button class="btn-primary" id="confirmImageSelect" style="flex: 1;">حفظ الصورة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: right;">
+            <div class="modal-header">
+                <h2 style="color: #c5221f;">هتمسح الحساب بجد؟</h2>
+                <span class="close" style="margin-left: 0; margin-right: auto;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>عشان تتأكد، اكتب كلمة "<b>امسح</b>" في المربع ده:</p>
+                <input type="text" id="deleteConfirm" class="form-input" placeholder="اكتب امسح هنا" style="margin: 1rem 0;">
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-outline" id="cancelDelete" style="flex: 1;">خلاص رجعت في كلامي</button>
+                    <button id="confirmDelete" style="flex: 1; background: #c5221f; color: white; padding: 0.5rem; border-radius: 8px; opacity: 0.5; cursor: not-allowed;" disabled>
+                        تأكيد المسح
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="profile-load.js"></script>
+    <script type="module" src="settings-account.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

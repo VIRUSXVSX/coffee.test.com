@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - الملف الشخصي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-layout">
+            
+            <aside class="profile-sidebar">
+                <div class="profile-image-container">
+                    <img id="profileImage" src="images/user.png" alt="Profile" class="profile-img-lg">
+                </div>
+                
+                <h2 id="userName" style="color: var(--primary-blue);">جاري التحميل...</h2>
+                <p id="userEducation" style="font-weight: bold;">زبون جديد</p>
+                
+                <!-- NEW: User Bio -->
+                <p id="userBio" style="margin: 0.5rem 0; font-size: 0.95rem; color: var(--text-dark); background: var(--bg-light); padding: 8px; border-radius: 8px;">
+                    أنا جديد في القهوة
+                </p>
+
+                <p id="userEmail" style="font-size:0.9rem; color:var(--text-grey); margin-bottom: 1rem;">...</p>
+                
+                <button class="btn-outline" style="width:100%; margin-bottom:1rem;" onclick="window.location.href='settings-account.html'">
+                    <i class="fa-solid fa-pen"></i> تعديل البيانات
+                </button>
+
+                <ul class="profile-menu">
+                    <li class="active" onclick="window.location.href='profile.html'">
+                        <i class="fa-solid fa-mug-hot"></i> مشاريب نزلتها
+                        <span id="postsCountBadge" class="badge">0</span>
+                    </li>
+                    <li onclick="window.location.href='settings.html'">
+                        <i class="fa-solid fa-cog"></i> الإعدادات
+                    </li>
+                </ul>
+            </aside>
+
+            <main>
+                <div style="margin-bottom:1rem; color:var(--text-grey);">
+                    <span style="cursor:pointer" onclick="window.location.href='index.html'">الرئيسية</span> / 
+                    <span style="color: var(--primary-blue);">الملف الشخصي</span>
+                </div>
+                
+                <h1 style="margin-bottom:1.5rem; color: var(--primary-blue);">أهلاً يا معلم</h1>
+
+                <!-- User Stats -->
+                <div class="settings-section" style="display: flex; justify-content: space-around; text-align: center;">
+                    <div>
+                        <h3 id="totalPosts" style="font-size: 2rem; color: var(--primary-blue);">0</h3>
+                        <p style="color: var(--text-grey);">مشاريب (بوستات)</p>
+                    </div>
+                    <div>
+                        <h3 id="totalLikes" style="font-size: 2rem; color: var(--primary-blue);">0</h3>
+                        <p style="color: var(--text-grey);">واجب (لايكات)</p>
+                    </div>
+                    <div>
+                        <h3 id="userRank"  style="font-size: 2rem; color: var(--primary-blue);">الزبون</h3>
+                        <p style="color: var(--text-grey);">الرتبة</p>
+                    </div>
+                </div>
+
+                <!-- Posts List -->
+                <div class="settings-section">
+                    <h2><i class="fa-solid fa-clock-rotate-left"></i> آخر مشاريبك</h2>
+                    <br>
+                    <div id="userPostsList">
+                        <div class="empty-state" style="text-align: center; padding: 2rem;">
+                            <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                            <p>بنجيب الأرشيف...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+    
+    <script type="module" src="profile-load.js"></script>
+    <script type="module" src="profile.js"></script>
+    <script src="script.js"></script>
+    <script>
+        
+    </script>
+</body>
+</html>

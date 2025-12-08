@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - الرئيسية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <!-- <li><a href="login.html">دخول</a></li> -->
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="landing-hero">
+        <h1 style="font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">أهلا بيك في القهوة</h1>
+        <p style="font-size: 1.5rem; margin-bottom: 2rem; max-width: 600px; line-height: 1.6; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+            أروق مكان على الإنترنت.. سيب همومك برة وادخل روق على حالك مع أحلى شلة.
+        </p>
+        
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+            <a href="dashboard.html" class="btn-primary" style="padding: 1rem 2.5rem; font-size: 1.2rem; border: 2px solid var(--primary-blue);">
+                <i class="fa-solid fa-mug-hot"></i> ادخل الصالة
+            </a>
+            <a href="signup.html" class="btn-outline" style="padding: 1rem 2.5rem; font-size: 1.2rem; background: rgba(255,255,255,0.1); color: white; border-color: white;">
+                <i class="fa-solid fa-user-plus"></i> لسه جديد؟
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="landing-section">
+        <h2>ليه تقعد معانا على القهوة؟</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-comments"></i>
+                <h3>فضفض براحتك</h3>
+                <p>مساحة حرة تكتب فيها اللي في بالك من غير ما حد يحكم عليك.. اعتبره بيتك.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-users"></i>
+                <h3>شلة صحاب</h3>
+                <p>هتلاقي ناس شبهك ورايقة، تتكلموا في الكورة، الشغل، أو حتى عن طعم القهوة.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fa-solid fa-heart"></i>
+                <h3>تفاعل حقيقي</h3>
+                <p>نظام "واجب" بدل اللايكات التقليدية، عشان التقدير عندنا بجد مش مجرد رقم.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <p>جميع الحقوق محفوظة &copy; 2025 القهوة</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">معمول بحب ☕ ومزاج عالي</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script type="module" src="profile-load.js"></script>
+</body>
+</html>

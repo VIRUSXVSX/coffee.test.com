@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - عضوية جديدة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="about.html">عن القهوة</a></li>
+        </ul>
+        <div class="nav-right">
+            <a href="login.html" class="btn-outline">دخول</a>
+        </div>
+    </nav> -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-mug-hot"></i> القهوة
+        </div>
+        <div class="nav-right">
+            <a href="login.html" class="btn-outline">دخول</a>
+        </div>
+    </nav>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>عضوية جديدة</h1>
+                <p>سجل اسمك في الدفتر عشان تحجز كرسيك</p>
+            </div>
+
+            <form id="signupForm">
+                <div class="form-group" style="text-align: right;">
+                    <label>الاسم بالكامل (اسم الشهرة)</label>
+                    <input type="text" id="fullName" class="form-input" placeholder="مثال: المعلم رضا" required>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>الإيميل</label>
+                    <input type="email" id="email" class="form-input" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group" style="text-align: right;">
+                    <label>كلمة السر</label>
+                    <input type="password" id="password" class="form-input" placeholder="اكتب رقم سري قوي" required minlength="6">
+                </div>
+                
+                <div style="text-align: right; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-grey);">
+                    بتسجيلك هنا، أنت بتوافق على <a href="#" style="color: var(--primary-blue);">قواعد القعدة</a> و <a href="#" style="color: var(--primary-blue);">الأصول</a>.
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%;">اعمل عضوية</button>
+                <div id="signupMessage" style="margin-top: 1rem; text-align: center;"></div>
+            </form>
+
+            <div class="auth-footer">
+                معاك عضوية أصلاً؟ <a href="login.html" style="color: var(--primary-blue);">ادخل علطول</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { signUp } from './auth-service.js';
+        
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('signupMessage');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
+            // Show loading state
+            messageDiv.style.color = 'var(--text-grey)';
+            messageDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> بيسجل اسمك في الدفتر...';
+            submitBtn.disabled = true;
+            
+            const result = await signUp(email, password, fullName);
+            
+            if (result.success) {
+                messageDiv.style.color = 'green';
+                messageDiv.innerHTML = '<i class="fa-solid fa-check-circle"></i> نورت القهوة يا معلم! جاري التحويل...';
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } else {
+                messageDiv.style.color = 'red';
+                // Translate common firebase errors roughly
+                let errorMsg = result.error;
+                if(errorMsg.includes('email-already-in-use')) errorMsg = "الإيميل ده متسجل قبل كده يا معلم";
+                else if(errorMsg.includes('weak-password')) errorMsg = "كلمة السر ضعيفة، كبرها شوية";
+                
+                messageDiv.textContent = errorMsg;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

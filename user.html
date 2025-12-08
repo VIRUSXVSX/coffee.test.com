@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - ملف شخصي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            <a href="index.html">القهوة</a>
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <!-- Back Button -->
+        <div style="margin-bottom: 1rem;">
+            <a href="dashboard.html" style="color: var(--text-grey); font-size: 0.9rem;">
+                <i class="fa-solid fa-arrow-right"></i> رجوع للصالة
+            </a>
+        </div>
+
+        <div class="profile-layout">
+            
+            <!-- Sidebar Info -->
+            <aside class="profile-sidebar">
+                <div class="profile-image-container">
+                    <img id="visitProfileImage" src="images/user.png" alt="Profile" class="profile-img-lg">
+                </div>
+                
+                <h2 id="visitUserName" style="color: var(--primary-blue); margin-bottom: 5px;">...</h2>
+                <p id="visitUserEducation" style="font-weight: bold; color: var(--text-grey);">...</p>
+                
+                <!-- Bio Display -->
+                <p id="visitUserBio" style="margin: 1rem 0; font-size: 0.95rem; color: var(--text-dark); background: var(--bg-light); padding: 10px; border-radius: 8px; line-height: 1.6;">
+                    ...
+                </p>
+
+                <p id="visitUserEmail" style="font-size:0.8rem; color:var(--text-grey); display:none;">...</p>
+                
+                <!-- Action Buttons (Future features like Follow/Message) -->
+                <!-- <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                    <button class="btn-primary" style="flex: 1; cursor: not-allowed; opacity: 0.7;">
+                        <i class="fa-solid fa-user-plus"></i> متابعة
+                    </button>
+                    <button class="btn-outline" style="flex: 1; cursor: not-allowed; opacity: 0.7;">
+                        <i class="fa-solid fa-envelope"></i> رسالة
+                    </button>
+                </div> -->
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Header Name -->
+                <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                    <h1 style="color: var(--primary-blue); font-size: 1.8rem;">
+                        الصفحة الشخصية لـ <span id="headerName">...</span>
+                    </h1>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="settings-section" style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 2rem;">
+                    <div>
+                        <h3 id="visitTotalPosts" style="font-size: 2rem; color: var(--primary-blue);">0</h3>
+                        <p style="color: var(--text-grey);">مشاريب</p>
+                    </div>
+                    <div>
+                        <h3 id="visitTotalLikes" style="font-size: 2rem; color: var(--primary-blue);">0</h3>
+                        <p style="color: var(--text-grey);">واجبات أخدها</p>
+                    </div>
+                    <div>
+                        <h3 id="visitUserRank" style="font-size: 2rem; color: var(--primary-blue);">الزبون</h3>
+                        <p style="color: var(--text-grey);">الرتبة</p>
+                    </div>
+                </div>
+
+                <!-- Posts List -->
+                <div class="settings-section">
+                    <h2><i class="fa-solid fa-mug-hot"></i> المشاريب اللي نزلها</h2>
+                    <br>
+                    <div id="visitUserPostsList">
+                        <div class="empty-state" style="text-align: center; padding: 2rem;">
+                            <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                            <p>بنجيب الملف...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+    
+    <script type="module" src="profile-load.js"></script>
+    <script type="module" src="user.js"></script> <!-- Specific Logic for User Page -->
+    <script src="script.js"></script>
+</body>
+</html>

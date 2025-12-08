@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - الصالة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html" class="active">الصالة</a></li>
+            <li><a href="fadfada.html" class="">بير الأسرار</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- Welcome Banner -->
+        <div style="background: var(--banner); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center; border: 1px solid var(--border-color);">
+            <!-- ID MUST MATCH greetings.js -->
+            <h2 id="welcomeText" style="color: var(--primary-text); font-size: 1.8rem; margin-bottom: 0.5rem;">يا هلا بيك يا معلم</h2>
+            <p style="color: var(--text-dark);">المكان مكانك.. اطلب واتمنى</p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Sidebar -->
+            <aside class="filters-sidebar">
+                <div class="filter-group">
+                    <h3><i class="fa-solid fa-bars"></i> قائمة المشاريب</h3>
+                    <ul style="list-style: none;">
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--primary-blue); background: rgba(111, 78, 55, 0.1); font-weight: bold; margin-bottom: 5px;">
+                            <i class="fa-solid fa-fire"></i> الكل (التريند)
+                        </li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey); margin-bottom: 5px;">
+                            <i class="fa-regular fa-star"></i> المميز
+                        </li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey);">
+                            <i class="fa-solid fa-user-group"></i> شلة الصحاب
+                        </li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey);" onclick="window.location.href='fadfada.html'">
+                       <i class="fa-solid fa-user-secret"></i>    بير الأسرار
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Feed -->
+            <main class="results-area">
+                
+                <!-- Create Post Box -->
+                <div class="search-input-header">
+                    <img id="userAvatarSmall" src="images/user.png" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color);">
+                    <!-- <input type="text" id="postInput" placeholder="اكتب اللي في بالك يا معلم..." autocomplete="off"> -->
+                     <textarea id="postInput" placeholder="اكتب اللي في بالك..." rows="1"></textarea>
+                     <!-- <textarea id="postInput" placeholder="اكتب اللي في بالك يا معلم..." rows="1"></textarea> -->
+                    <button id="publishBtn" class="btn-primary">
+                        <i class="fa-solid fa-paper-plane"></i> انشر
+                    </button>
+                </div>
+
+                <!-- Feed Container -->
+                <div id="postsFeed">
+                    <div style="text-align: center; padding: 4rem; color: var(--text-grey);">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                        <p style="margin-top: 15px;">بنسخن الرملة...</p>
+                    </div>
+                </div>
+<button id="scrollToTopBtn" title="Go to top"><i class="fa-solid fa-up-long"></i></button>
+<!-- <button id="scrollToTopBtn" title="Go to top">⬆️</button> -->
+
+            </main> 
+        </div>
+    </div>
+<script>
+    // Get the button
+let mybutton = document.getElementById("scrollToTopBtn");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+mybutton.onclick = function() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // This makes the scroll smooth
+  });
+};
+</script>
+    <!-- Scripts -->
+    <script type="module" src="profile-load.js"></script>
+    <script type="module" src="dashboard.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- FIXED: Added type="module" so imports work -->
+    <script type="module" src="greetings.js"></script>
+</body>
+</html>

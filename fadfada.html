@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - بير الأسرار</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="fadfada.html" class="active">بير الأسرار</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <div style="background: linear-gradient(135deg, #2C1810 0%, #4A3424 100%); padding: 2.5rem; border-radius: 12px; margin-bottom: 2rem; text-align: center; border: 1px solid var(--border-color); color: white;">
+            <i class="fa-solid fa-user-secret" style="font-size: 3rem; margin-bottom: 1rem; color: var(--accent-yellow);"></i>
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">بير الأسرار</h2>
+            <p style="color: #ddd;">فضفض وطلع اللي في قلبك.. محدش عارفك هنا 🎭</p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <aside class="filters-sidebar">
+                                                <div class="filter-group">
+                    <h3><i class="fa-solid fa-bars"></i> قائمة المشاريب</h3>
+                    <ul style="list-style: none;">
+                        
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey);" onclick="window.location.href='dashboard.html'">
+                            <i class="fa-solid fa-fire"></i> الكل (التريند)
+                        </li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey); margin-bottom: 5px;">
+                            <i class="fa-regular fa-star"></i> المميز
+                        </li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey);">
+                            <i class="fa-solid fa-user-group"></i> شلة الصحاب
+                        </li>
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--primary-blue); background: rgba(111, 78, 55, 0.1); font-weight: bold; margin-bottom: 5px;">
+                       <i class="fa-solid fa-user-secret"></i>    بير الأسرار
+                        </li>
+                    </ul>
+                </div>
+                <br>
+                <hr>
+                <br>
+                <div class="filter-group">
+                    <h3><i class="fa-solid fa-shield-halved"></i> قواعد البير</h3>
+                    <ul style="list-style: none; color: var(--text-grey); font-size: 0.9rem;">
+                        <li style="margin-bottom: 10px;">🤐 <strong>سرية تامة:</strong> اسمك وصورتك مش بيظهروا خالص.</li>
+                        <li style="margin-bottom: 10px;">🚫 <strong>الاحترام:</strong> بلاش تجريح في حد بعينه.</li>
+                        <li style="margin-bottom: 10px;">🤝 <strong>النصيحة:</strong> لو هترد، رد بالكلمة الطيبة.</li>
+                    </ul>
+                </div>
+
+
+
+                
+            </aside>
+            
+
+            <main class="results-area">
+                
+                <div class="search-input-header secret-input-box">
+                    <div style="width: 45px; height: 45px; border-radius: 50%; background: #2C1810; display: flex; align-items: center; justify-content: center; color: var(--accent-yellow);">
+                        <i class="fa-solid fa-mask" style="font-size: 1.2rem;"></i>
+                    </div>
+                     <textarea id="secretInput" placeholder="اكتب مشكلتك هنا.. سرك في بير..." rows="1"></textarea>
+                    <button id="publishSecretBtn" class="btn-primary" style="background: #2C1810; border: 1px solid var(--accent-yellow); color: var(--accent-yellow);">
+                        <i class="fa-solid fa-ghost"></i> انشر في السر
+                    </button>
+                </div>
+
+                <div id="secretsFeed">
+                    <div style="text-align: center; padding: 4rem; color: var(--text-grey);">
+                        <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i>
+                        <p style="margin-top: 15px;">بندور في الأسرار...</p>
+                    </div>
+                </div>
+            </main> 
+        </div>
+    </div>
+<button id="scrollToTopBtn" title="Go to top"><i class="fa-solid fa-up-long"></i></button>
+<!-- <button id="scrollToTopBtn" title="Go to top">⬆️</button> -->
+ <script>
+    // Get the button
+let mybutton = document.getElementById("scrollToTopBtn");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+mybutton.onclick = function() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // This makes the scroll smooth
+  });
+};
+</script>
+    <script type="module" src="profile-load.js"></script>
+    <script type="module" src="fadfada.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
