@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - طلبات الصداقة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><div class="logo1"><img src="images/logo1.png" class="logoimg"></div>القهوة</div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="friends.html">الشلة</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-layout">
+            <aside class="profile-sidebar">
+                <ul class="profile-menu" style="margin-top:0;">
+                    <li onclick="window.location.href='friends.html'"><i class="fa-solid fa-user-group"></i> الشلة (الأصدقاء)</li>
+                    <li class="active" onclick="window.location.href='friends-requests.html'"><i class="fa-solid fa-user-plus"></i> طلبات الصداقة</li>
+                    <li onclick="window.location.href='notifications.html'"><i class="fa-solid fa-bell"></i> الإشعارات</li>
+                </ul>
+            </aside>
+
+            <main>
+                <h1 style="color: var(--primary-blue); margin-bottom: 1.5rem;">طلبات الانضمام للشلة 📩</h1>
+                <div id="requestsList">
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> بنشوف الطلبات...
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, getIncomingRequests, acceptFriendRequest, denyFriendRequest } from './auth-service.js';
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) loadRequests();
+            else window.location.href = 'login.html';
+        });
+
+        async function loadRequests() {
+            const list = document.getElementById('requestsList');
+            const res = await getIncomingRequests();
+            
+            if (!res.success || res.data.length === 0) {
+                list.innerHTML = `<div style="text-align: center; padding: 3rem; color: var(--text-grey);">
+                    <i class="fa-regular fa-envelope-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>مفيش طلبات جديدة.. أنت مسيطر!</p>
+                </div>`;
+                return;
+            }
+
+            // ملاحظة: تأكدنا هنا من تمرير req.from بشكل صحيح
+            list.innerHTML = res.data.map(req => `
+                <div class="uni-card" id="req-${req.requestId}" style="display:flex; justify-content:space-between; align-items:center; padding:1.5rem; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <img src="${req.sender.profileImage || 'images/user.png'}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <h3 style="font-size:1.1rem; margin:0;">${req.sender.fullName}</h3>
+                            <p style="font-size:0.8rem; color:var(--text-grey); margin:0;">عايز ينضم لشلتك</p>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-primary" onclick="window.acceptReq('${req.requestId}', '${req.from}')">
+                            <i class="fa-solid fa-check"></i> موافق
+                        </button>
+                        <button class="btn-outline" style="border-color:#c5221f; color:#c5221f;" onclick="window.denyReq('${req.requestId}')">
+                            <i class="fa-solid fa-xmark"></i> فكك
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.acceptReq = async (rid, uid) => {
+            if(!confirm('موافق؟')) return;
+            
+            const btn = document.querySelector(`#req-${rid} .btn-primary`);
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            const result = await acceptFriendRequest(rid, uid);
+            
+            if (result.success) {
+                document.getElementById(`req-${rid}`).style.opacity = '0.5';
+                loadRequests(); // تحديث القائمة
+                alert("تمت الإضافة للشلة! 🤝");
+            } else {
+                alert("حصل خطأ: " + result.error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.denyReq = async (rid) => {
+            if(!confirm('أكيد؟')) return;
+            await denyFriendRequest(rid);
+            loadRequests();
+        };
+    </script>
+    <script src="script.js"></script>
+        <script type="module" src="profile-load.js"></script>
+
+</body>
+</html>

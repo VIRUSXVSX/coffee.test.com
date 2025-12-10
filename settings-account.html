@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- MAGIC FIX FOR GOOGLE DRIVE IMAGES -->
+    <meta name="referrer" content="no-referrer">
+    
     <title>القهوة - إعدادات الحساب</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -80,6 +83,30 @@
                             </div>
                         </div>
                         
+                        <!-- NEW: Signature Drink Selection -->
+                        <div class="form-group" style="background: rgba(255, 193, 7, 0.1); padding: 10px; border-radius: 8px; border: 1px dashed #ffc107;">
+                            <label for="signatureDrink" style="color: #d39e00; font-weight: bold;">
+                                <i class="fa-solid fa-mug-hot"></i> مشروب المزاج (هيظهر جنب اسمك)
+                            </label>
+                            <select id="signatureDrink" class="form-input">
+                                <option value="">ولا حاجة (صايم)</option>
+                                <option value="tea">شاي في الخمسينة ☕</option>
+                                <option value="mint_tea">شاي بالنعناع 🌿</option>
+                                <option value="coffee">قهوة تركي ☕</option>
+                                <option value="french_coffee">قهوة فرنساوي 🥛</option>
+                                <option value="nescafe">نسكافية / كابتشينو 🥤</option>
+                                <option value="espresso">إسبريسو 🧉</option>
+                                <option value="anise">يانسون دافي 🌼</option>
+                                <option value="sahlab">سحلب بالمكسرات 🥥</option>
+                                <option value="lemon">ليمون بالنعناع 🍋</option>
+                                <option value="mango">عصير مانجا 🥭</option>
+                                <option value="cane">عصير قصب 🎋</option>
+                                <option value="shisha">شيشة تفاح 🍎</option>
+                                <option value="cola">حاجة ساقعة 🥤</option>
+                                <option value="water">مية ساقعة 💧</option>
+                            </select>
+                        </div>
+
                         <div class="form-group">
                             <label for="userBio">نبذة عنك (Bio)</label>
                             <textarea id="userBio" class="form-input" rows="3" placeholder="اكتب كلمتين عن نفسك..."></textarea>
@@ -104,7 +131,7 @@
                     </form>
                 </div>
 
-                <!-- Security Section (New) -->
+                <!-- Security Section -->
                 <div class="settings-section">
                     <h2><i class="fa-solid fa-shield-halved"></i> الأمان والخصوصية</h2>
                     <p style="color: var(--text-grey); margin-bottom: 1rem;">عايز تغير الباسورد عشان نسيتوا ولا عشان خايف من المدام؟ 😉</p>
@@ -145,6 +172,25 @@
                 <div id="imageGrid" class="image-grid">
                     <!-- Images inserted by JS -->
                 </div>
+                
+                <div id="customImageInput" style="display: none; margin-top: 15px; background: var(--bg-light); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary-blue);">حط لينك الصورة هنا:</label>
+                    <input type="text" id="customImageUrl" class="form-input" placeholder="https://example.com/image.jpg" style="direction: ltr;">
+                    <p style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">
+                        <i class="fa-brands fa-google-drive"></i> لو معاك لينك جوجل درايف، حطه وإحنا هنظبطه 😉
+                    </p>
+                    <p style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">
+                                            و لازم تكون عامل access اللينك anyone with link 👍
+                    </p>
+                    
+                    <div style="margin-top: 10px; text-align: center;">
+                        <img id="customImagePreview" src="images/user.png" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); display: none;">
+                        <div id="imgPreviewError" style="display:none; color: red; font-size: 0.8rem; margin-top: 5px;">
+                            <i class="fa-solid fa-triangle-exclamation"></i> الصورة مش بتحمل! اتأكد إنها Public
+                        </div>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 10px; margin-top: 1rem;">
                     <button class="btn-outline" id="cancelImageSelect" style="flex: 1;">إلغاء</button>
                     <button class="btn-primary" id="confirmImageSelect" style="flex: 1;">حفظ الصورة</button>
@@ -153,12 +199,11 @@
         </div>
     </div>
 
-    <!-- Password Modal (Funny) -->
+    <!-- Password Modal -->
     <div id="passwordModal" class="modal" style="display: none;">
         <div class="modal-content" style="text-align: right;">
             <div class="modal-header">
                 <h3 style="color: var(--primary-blue);"><i class="fa-solid fa-user-secret"></i> عملية سرية للغاية</h3>
-                <!-- <span class="close" id="closePassModal" style="margin-left: 0; margin-right: auto;">&times;</span> -->
             </div>
             <div class="modal-body">
                 <form id="changePasswordForm">
@@ -188,7 +233,6 @@
         <div class="modal-content" style="text-align: right;">
             <div class="modal-header">
                 <h2 style="color: #c5221f;">هتمسح الحساب بجد؟</h2>
-                <!-- <span class="close" style="margin-left: 0; margin-right: auto;">&times;</span> -->
             </div>
             <div class="modal-body">
                 <p>عشان تتأكد، اكتب كلمة "<b>امسح</b>" في المربع ده:</p>
@@ -208,5 +252,4 @@
     <script type="module" src="settings-account.js"></script>
     <script src="script.js"></script>
 </body>
-
 </html>

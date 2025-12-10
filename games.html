@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - صالة الألعاب</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+    <script src="theme.js"></script>
+    <style>
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-blue);
+        }
+        .game-icon {
+            font-size: 4rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .game-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #ffc107;
+            color: #4a3424;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="games.html" class="active">الألعاب</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1 style="color: var(--primary-blue); font-size: 2.5rem; margin-bottom: 1rem;">صالة التسلية 🎲</h1>
+            <p style="color: var(--text-grey); font-size: 1.1rem;">اشرب قهوتك والعب شوية.. المنافسة هنا حامية!</p>
+        </div>
+
+        <div class="games-grid">
+            
+            <!-- XO Game Card -->
+            <div class="game-card">
+                <span class="game-badge"><i class="fa-solid fa-fire"></i> الجديد</span>
+                <div class="game-icon">
+                    <i class="fa-solid fa-chess-board"></i>
+                </div>
+                <h2 style="margin-bottom: 0.5rem; color: var(--text-dark);">إكس أو المشاريب ❌⭕</h2>
+                <p style="color: var(--text-grey); margin-bottom: 1.5rem;">
+                    تحدي القهوة والشاي! العب ضد الكمبيوتر الذكي أو تحدى صاحبك جنبك. مين هيكسب المشاريب؟
+                </p>
+                
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="window.location.href='games-xo.html'" class="btn-primary" style="flex: 2;">
+                        <i class="fa-solid fa-play"></i> العب دلوقتي
+                    </button>
+                    <!-- <button onclick="shareGame('إكس أو المشاريب', 'games-xo.html')" class="btn-outline" style="flex: 1;" title="اعزم صاحبك">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button> -->
+                </div>
+            </div>
+
+            <!-- Future Game Placeholder -->
+            <div class="game-card" style="opacity: 0.7; cursor: not-allowed;">
+                <span class="game-badge" style="background: var(--text-grey); color: white;">قريباً</span>
+                <div class="game-icon" style="color: var(--text-grey);">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                </div>
+                <h2 style="margin-bottom: 0.5rem; color: var(--text-grey);">لعبة السلم والثعبان</h2>
+                <p style="color: var(--text-grey); margin-bottom: 1.5rem;">
+                    قريباً على القهوة.. استنونا!
+                </p>
+                <button class="btn-outline" disabled style="width: 100%; border-color: transparent; background: #eee;">
+                    تحت الإنشاء 🚧
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Share Toast -->
+    <div id="shareToast" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text-dark); color: white; padding: 10px 20px; border-radius: 20px; display: none; z-index: 2000;">
+        تم نسخ رابط اللعبة! ابعته لصاحبك 😉
+    </div>
+
+    <script type="module" src="profile-load.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function shareGame(gameName, url) {
+            const fullUrl = window.location.origin + '/' + url;
+            const text = `تعالى العب معايا ${gameName} على موقع القهوة! ☕🎲\n${fullUrl}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: gameName,
+                    text: text,
+                    url: fullUrl
+                }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    const toast = document.getElementById('shareToast');
+                    toast.style.display = 'block';
+                    setTimeout(() => toast.style.display = 'none', 3000);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

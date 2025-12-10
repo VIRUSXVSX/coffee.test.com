@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - الإشعارات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><div class="logo1"><img src="images/logo1.png" class="logoimg"></div>القهوة</div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-layout">
+            <aside class="profile-sidebar">
+                <ul class="profile-menu" style="margin-top:0;">
+                    <li onclick="window.location.href='friends.html'"><i class="fa-solid fa-user-group"></i> الشلة (الأصدقاء)</li>
+                    <li onclick="window.location.href='friends-requests.html'"><i class="fa-solid fa-user-plus"></i> طلبات الصداقة</li>
+                    <li class="active" onclick="window.location.href='notifications.html'"><i class="fa-solid fa-bell"></i> الإشعارات</li>
+                </ul>
+            </aside>
+
+            <main>
+                <h1 style="color: var(--primary-blue); margin-bottom: 1.5rem;">الإشعارات 🔔</h1>
+                <div id="notifList">
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> بنشوف الجديد...
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, getNotifications, markNotificationRead } from './auth-service.js';
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) loadNotifs();
+            else window.location.href = 'login.html';
+        });
+
+        async function loadNotifs() {
+            const list = document.getElementById('notifList');
+            const res = await getNotifications();
+            
+            if (!res.success || res.data.length === 0) {
+                list.innerHTML = `<div style="text-align: center; padding: 3rem; color: var(--text-grey);">
+                    <i class="fa-regular fa-bell-slash" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>مفيش أخبار جديدة.</p>
+                </div>`;
+                return;
+            }
+
+            list.innerHTML = res.data.map(n => {
+                let icon = 'fa-info-circle';
+                let content = n.message;
+                let action = '';
+                
+                if (n.type === 'friend_request') {
+                    icon = 'fa-user-plus';
+                    action = `<button class="btn-primary" onclick="window.location.href='friends-requests.html'">شوف الطلب</button>`;
+                } else if (n.type === 'game_invite') {
+                    icon = 'fa-gamepad';
+                    action = `<button class="btn-primary" onclick="window.location.href='games-xo.html?gameId=${n.gameId}'">العب ديلوقتي</button>`;
+                } else if (n.type === 'request_accepted') {
+                    icon = 'fa-check-circle';
+                }
+
+                return `
+                    <div class="uni-card" style="display:flex; gap:15px; align-items:center; padding:1.5rem; border-left: 5px solid ${n.read ? '#ccc' : 'var(--primary-blue)'}; margin-bottom: 10px;">
+                        <div style="font-size:1.5rem; color:var(--primary-blue);"><i class="fa-solid ${icon}"></i></div>
+                        <div style="flex:1;">
+                            <p style="margin-bottom:5px;">${content}</p>
+                            <span style="font-size:0.8rem; color:var(--text-grey);">${n.timestamp ? new Date(n.timestamp.toDate()).toLocaleString('ar-EG') : 'دلوقتي'}</span>
+                        </div>
+                        ${action}
+                    </div>
+                `;
+            }).join('');
+            
+            // Mark unread as read
+            res.data.forEach(n => {
+                if(!n.read) markNotificationRead(n.id);
+            });
+        }
+    </script>
+        <script type="module" src="profile-load.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

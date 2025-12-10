@@ -37,7 +37,6 @@
                 <h2 id="userName" style="color: var(--primary-blue);">جاري التحميل...</h2>
                 <p id="userEducation" style="font-weight: bold;">زبون جديد</p>
                 
-                <!-- NEW: User Bio -->
                 <p id="userBio" style="margin: 0.5rem 0; font-size: 0.95rem; color: var(--text-dark); background: var(--bg-light); padding: 8px; border-radius: 8px;">
                     أنا جديد في القهوة
                 </p>
@@ -53,6 +52,8 @@
                         <i class="fa-solid fa-mug-hot"></i> مشاريب نزلتها
                         <span id="postsCountBadge" class="badge">0</span>
                     </li>
+                    <li class="" onclick="window.location.href='friends.html'"><i class="fa-solid fa-user-group"></i> الشلة (الأصدقاء)</li>
+
                     <li onclick="window.location.href='settings.html'">
                         <i class="fa-solid fa-cog"></i> الإعدادات
                     </li>
@@ -83,6 +84,15 @@
                     </div>
                 </div>
 
+                <!-- My Friends List (NEW) -->
+                <div class="settings-section">
+                    <h2><i class="fa-solid fa-users"></i> شلتي (الأصدقاء)</h2>
+                    <br>
+                    <div id="myFriendsList" class="friends-grid">
+                         <p style="color:var(--text-grey); font-size:0.9rem;">بنجيب الشلة...</p>
+                    </div>
+                </div>
+
                 <!-- Posts List -->
                 <div class="settings-section">
                     <h2><i class="fa-solid fa-clock-rotate-left"></i> آخر مشاريبك</h2>
@@ -102,8 +112,5 @@
     <script type="module" src="profile-load.js"></script>
     <script type="module" src="profile.js"></script>
     <script src="script.js"></script>
-    <script>
-        
-    </script>
 </body>
 </html>

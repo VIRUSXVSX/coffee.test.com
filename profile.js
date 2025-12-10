@@ -1,147 +1,3 @@
-// import { 
-//     auth, 
-//     onAuthStateChanged, 
-//     getUserData, 
-//     getUserPosts, 
-//     deletePost
-// } from './auth-service.js';
-
-// let currentUser = null;
-// let userData = null;
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     onAuthStateChanged(auth, async (user) => {
-//         if (user) {
-//             currentUser = user;
-//             await loadUserData();
-//             await loadUserStatsAndPosts();
-//         } else {
-//             window.location.href = 'login.html';
-//         }
-//     });
-// });
-
-// async function loadUserData() {
-//     const result = await getUserData(currentUser.uid);
-//     if (result.success) {
-//         userData = result.data;
-//         updateProfileInfo(); // Updated function name
-//     }
-// }
-
-// function updateProfileInfo() {
-//     // 1. Sidebar Info
-//     const imgEl = document.getElementById('profileImage');
-//     const nameEl = document.getElementById('userName');
-//     const eduEl = document.getElementById('userEducation');
-//     const emailEl = document.getElementById('userEmail');
-//     const bioEl = document.getElementById('userBio');
-
-//     if(imgEl) imgEl.src = userData.profileImage || 'images/user.png';
-//     if(nameEl) nameEl.textContent = userData.fullName || 'الزبون';
-//     if(eduEl) eduEl.textContent = userData.educationLevel || 'زبون جديد';
-//     if(bioEl) bioEl.textContent = userData.bio || 'أنا جديد في القهوة';
-//     if(emailEl) emailEl.textContent = currentUser.email;
-
-//     // 2. Update Rank (Role) from Firebase
-//     const rankEl = document.getElementById('userRank');
-//     if(rankEl) {
-//         // Defaults to 'زبون' if role is missing in DB
-//         rankEl.textContent = userData.role || 'زبون'; 
-//     }
-// }
-
-// async function loadUserStatsAndPosts() {
-//     const postsListEl = document.getElementById('userPostsList');
-    
-//     // Fetch posts
-//     const result = await getUserPosts(currentUser.uid);
-
-//     if (result.success) {
-//         const posts = result.data;
-        
-//         // Calculate Stats
-//         const totalPosts = posts.length;
-//         let totalLikes = 0;
-//         posts.forEach(p => {
-//             if(p.likes) totalLikes += p.likes.length;
-//         });
-
-//         document.getElementById('totalPosts').textContent = totalPosts;
-//         document.getElementById('totalLikes').textContent = totalLikes;
-//         if(document.getElementById('postsCountBadge')) {
-//             document.getElementById('postsCountBadge').textContent = totalPosts;
-//         }
-
-//         // Render Posts
-//         if (posts.length === 0) {
-//             postsListEl.innerHTML = `
-//                 <div class="empty-state" style="text-align: center; padding: 2rem;">
-//                     <i class="fa-solid fa-mug-saucer" style="font-size: 3rem; color: var(--border-color); margin-bottom: 1rem;"></i>
-//                     <h3>لسه منزلش حاجة</h3>
-//                     <p>روح الصالة ونزل أول بوست ليك</p>
-//                     <button class="btn-primary" onclick="window.location.href='dashboard.html'" style="margin-top: 1rem;">
-//                         روح الصالة
-//                     </button>
-//                 </div>
-//             `;
-//         } else {
-//             postsListEl.innerHTML = posts.map(post => `
-//                 <div class="uni-card" id="post-${post.id}" style="border: 1px solid var(--border-color); padding: 1rem; margin-bottom: 1rem; border-radius: 8px;">
-//                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-//                         <span style="color: var(--text-grey); font-size: 0.9rem;">
-//                              ${post.timestamp ? new Date(post.timestamp.toDate()).toLocaleDateString('ar-EG') : 'دلوقتي'}
-//                         </span>
-//                         <button class="btn-danger-light delete-btn" data-id="${post.id}" style="padding: 2px 8px; font-size: 0.8rem; color:red; background-color: transparent; border: none;">
-//                             <i class="fa-solid fa-trash" style="font-size: 15px;"></i> 
-//                         </button>
-//                     </div>
-//                     <p style="white-space: pre-wrap; margin-bottom: 1rem;">${escapeHtml(post.content)}</p>
-//                     <div style="display: flex; gap: 15px; font-size: 0.9rem; color: var(--text-grey);">
-//                         <span><i class="fa-solid fa-thumbs-up"></i> ${post.likes ? post.likes.length : 0} واجب</span>
-//                     </div>
-//                 </div>
-//             `).join('');
-
-//             // Delete Logic
-//             document.querySelectorAll('.delete-btn').forEach(btn => {
-//                 btn.addEventListener('click', async function() {
-//                     if(confirm("عايز تمسح البوست ده؟")) {
-//                         const pid = this.dataset.id;
-//                         await deletePost(pid);
-//                         document.getElementById(`post-${pid}`).remove();
-//                         const currentCount = parseInt(document.getElementById('totalPosts').textContent);
-//                         document.getElementById('totalPosts').textContent = Math.max(0, currentCount - 1);
-//                     }
-//                 });
-//             });
-//         }
-//     } else {
-//         postsListEl.innerHTML = `<p style="color:red">حصل خطأ في تحميل البوستات</p>`;
-//     }
-// }
-
-// function escapeHtml(text) {
-//     if (!text) return "";
-//     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { 
     auth, 
     onAuthStateChanged, 
@@ -150,7 +6,8 @@ import {
     deletePost,
     addComment,
     getComments,
-    toggleLike
+    toggleLike,
+    getUserFriends
 } from './auth-service.js';
 
 let currentUser = null;
@@ -165,6 +22,24 @@ const REACTION_TYPES = {
     dislike: { icon: '👎', label: 'هبد', class: 'color-dislike' }
 };
 
+// --- FIXED: DRINKS_MAP matching settings-account.html values ---
+const DRINKS_MAP = {
+    'tea': 'شاي في الخمسينة ☕',
+    'mint_tea': 'شاي بالنعناع 🌿',
+    'coffee': 'قهوة تركي ☕',
+    'french_coffee': 'قهوة فرنساوي 🥛',
+    'nescafe': 'نسكافية / كابتشينو 🥤',
+    'espresso': 'إسبريسو 🧉',
+    'anise': 'يانسون دافي 🌼',
+    'sahlab': 'سحلب بالمكسرات 🥥',
+    'lemon': 'ليمون بالنعناع 🍋',
+    'mango': 'عصير مانجا 🥭',
+    'cane': 'عصير قصب 🎋',
+    'shisha': 'شيشة تفاح 🍎',
+    'cola': 'حاجة ساقعة 🥤',
+    'water': 'مية ساقعة 💧'
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     injectStylesProfile();
     createReactorsModalProfile();
@@ -174,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentUser = user;
             await loadUserData();
             await loadUserStatsAndPosts();
+            await loadMyFriends();
         } else {
             window.location.href = 'login.html';
         }
@@ -196,13 +72,46 @@ function updateProfileInfo() {
     const bioEl = document.getElementById('userBio');
 
     if(imgEl) imgEl.src = userData.profileImage || 'images/user.png';
-    if(nameEl) nameEl.textContent = userData.fullName || 'الزبون';
+    
+    // --- Display Signature Drink ---
+    if(nameEl) {
+        let nameHtml = userData.fullName || 'الزبون';
+        // Check if drink exists in map
+        if (userData.signatureDrink && DRINKS_MAP[userData.signatureDrink]) {
+            nameHtml += ` <div style="font-size: 0.8rem; background: #fff8e1; color: #f57f17; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 5px; border: 1px solid #ffe082; vertical-align: middle;">
+                طلبك: ${DRINKS_MAP[userData.signatureDrink]}
+            </div>`;
+        }
+        nameEl.innerHTML = nameHtml;
+    }
+
     if(eduEl) eduEl.textContent = userData.educationLevel || 'زبون جديد';
     if(bioEl) bioEl.textContent = userData.bio || 'أنا جديد في القهوة';
     if(emailEl) emailEl.textContent = currentUser.email;
 
     const rankEl = document.getElementById('userRank');
     if(rankEl) rankEl.textContent = userData.role || 'زبون'; 
+}
+
+async function loadMyFriends() {
+    const listEl = document.getElementById('myFriendsList');
+    if(!listEl) return;
+    
+    const result = await getUserFriends(currentUser.uid);
+    if(result.success) {
+        if(result.data.length === 0) {
+            listEl.innerHTML = '<p style="color:var(--text-grey); font-size:0.9rem;">لسه مفيش حد في الشلة.</p>';
+        } else {
+            listEl.innerHTML = result.data.map(f => `
+                <div onclick="window.location.href='user.html?uid=${f.id}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; cursor:pointer; width:60px;">
+                    <img src="${f.profileImage || f.photoURL || 'images/user.png'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--border-color);">
+                    <span style="font-size:0.7rem; color:var(--text-dark); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; width:100%; text-align:center;">
+                        ${(f.fullName||'زبون').split(' ')[0]}
+                    </span>
+                </div>
+            `).join('');
+        }
+    }
 }
 
 async function loadUserStatsAndPosts() {
@@ -251,7 +160,7 @@ async function loadUserStatsAndPosts() {
             attachProfileListeners();
         }
     } else {
-        postsListEl.innerHTML = `<p style="color:red">حصل خطأ في تحميل البوستات</p>`;
+        postsListEl.innerHTML = `<p style="color:red">حصل خطأ في تحميل البوستات: ${result.error || ''}</p>`;
     }
 }
 
@@ -352,16 +261,13 @@ window.toggleCommentsProfile = function(postId) {
 window.showReactorsModal = async function(postId) {
     const modal = document.getElementById('reactorsModal');
     const list = document.getElementById('reactorsList');
-    const loading = document.getElementById('reactorsLoading');
     
     modal.style.display = 'flex';
-    list.innerHTML = '';
-    loading.style.display = 'block';
+    list.innerHTML = 'تحميل...';
 
     const postsResult = await getUserPosts(currentUser.uid); 
     const post = postsResult.data.find(p => p.id === postId);
     
-    // --- FIX START ---
     let reactions = {};
     if (post) {
         if (Array.isArray(post.likes)) {
@@ -371,12 +277,10 @@ window.showReactorsModal = async function(postId) {
             Object.assign(reactions, post.reactions);
         }
     }
-    // --- FIX END ---
 
     const uids = Object.keys(reactions);
 
     if (uids.length === 0) {
-        loading.style.display = 'none';
         list.innerHTML = '<p style="text-align:center; padding:1rem;">مفيش تفاعل لسه</p>';
         return;
     }
@@ -392,7 +296,7 @@ window.showReactorsModal = async function(postId) {
         html += `
             <div class="reactor-item">
                 <div style="position:relative;">
-                    <img src="${userData.photoURL || 'images/user.png'}" class="reactor-img">
+                    <img src="${userData.profileImage || userData.photoURL || 'images/user.png'}" class="reactor-img">
                     <span class="reactor-icon-badge">${icon}</span>
                 </div>
                 <div class="reactor-info">
@@ -402,8 +306,6 @@ window.showReactorsModal = async function(postId) {
             </div>
         `;
     }
-
-    loading.style.display = 'none';
     list.innerHTML = html;
 };
 
@@ -474,6 +376,7 @@ function injectStylesProfile() {
             padding: 8px 0; margin: 0 10px; border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem; color: var(--text-grey);
         }
+        .friends-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .stats-icons { font-size: 1.1rem; margin-left: 5px; vertical-align: middle; }
         .stats-text:hover, .stats-comments:hover { text-decoration: underline; color: var(--primary-blue); }
         .custom-modal {
@@ -521,9 +424,6 @@ function createReactorsModalProfile() {
                 <span onclick="document.getElementById('reactorsModal').style.display='none'" style="cursor:pointer">&times;</span>
             </div>
             <div class="custom-modal-body">
-                <div id="reactorsLoading" style="text-align:center; padding:20px;">
-                    <i class="fa-solid fa-spinner fa-spin"></i> تحميل...
-                </div>
                 <div id="reactorsList"></div>
             </div>
         </div>
