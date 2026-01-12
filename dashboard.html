@@ -18,13 +18,13 @@
             القهوة
         </div>
         <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
-        <ul class="nav-links">
-            <li><a href="index.html">الرئيسية</a></li>
-            <li><a href="dashboard.html" class="active">الصالة</a></li>
-            <li><a href="fadfada.html" class="">بير الأسرار</a></li>
-            <li><a href="games.html" class="">الألعاب</a></li>
-            <li><a href="profile.html">حسابي</a></li>
-        </ul>
+    <ul class="nav-links">
+    <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+    <li><a href="dashboard.html" class="active"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+    <li><a href="fadfada.html"><i class="fa-solid fa-user-secret"></i> بير الأسرار</a></li>
+    <li><a href="games.html"><i class="fa-solid fa-gamepad"></i> الألعاب</a></li>
+    <!-- <li><a href="profile.html"><i class="fa-solid fa-user"></i> حسابي</a></li> -->
+</ul>
         <div class="nav-right" id="navAuth"></div>
     </nav>
 
@@ -40,15 +40,27 @@
         <div class="dashboard-grid">
             
             <!-- Sidebar -->
-            <aside class="filters-sidebar">
+<aside class="filters-sidebar">
+                <div class="modern-search-wrapper">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="userSearchInput" placeholder="بتدور على مين يا زميلي؟" autocomplete="off">
+                        <div class="search-loader" id="searchLoader"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
+                    </div>
+                    <div id="searchResultsDropdown" class="search-results-list">
+                        </div>
+                </div>
+
+                <hr style="border-color: var(--border-color); opacity: 0.3; margin: 15px 0;">
+
                 <div class="filter-group">
                     <h3><i class="fa-solid fa-bars"></i> قائمة المشاريب</h3>
                     <ul style="list-style: none;">
-                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--primary-blue); background: rgba(111, 78, 55, 0.1); font-weight: bold; margin-bottom: 5px;">
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--primary-blue); background: rgba(111, 78, 55, 0.1); font-weight: bold; margin-bottom: 5px;" onclick="window.location.href='dashboard.html'">
                             <i class="fa-solid fa-fire"></i> الكل (التريند)
                         </li>
-                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey); margin-bottom: 5px;">
-                            <i class="fa-regular fa-star"></i> المميز
+                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey); margin-bottom: 5px;" onclick="window.location.href='games.html'">
+                            <i class="fa-solid fa-gamepad"></i> الألعاب
                         </li>
                         <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey);" onclick="window.location.href='friends.html'">
                             <i class="fa-solid fa-user-group"></i> شلة الصحاب
@@ -59,7 +71,6 @@
                     </ul>
                 </div>
             </aside>
-
             <!-- Main Feed -->
             <main class="results-area">
                 
@@ -88,27 +99,7 @@
         </div>
     </div>
 <script>
-    // Get the button
-let mybutton = document.getElementById("scrollToTopBtn");
 
-// When the user scrolls down 20px from the top of the document, show the button
-window.onscroll = function() {scrollFunction()};
-
-function scrollFunction() {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    mybutton.style.display = "block";
-  } else {
-    mybutton.style.display = "none";
-  }
-}
-
-// When the user clicks on the button, scroll to the top of the document
-mybutton.onclick = function() {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth' // This makes the scroll smooth
-  });
-};
 </script>
     <!-- Scripts -->
     <script type="module" src="profile-load.js"></script>

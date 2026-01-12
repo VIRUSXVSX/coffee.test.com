@@ -13,10 +13,10 @@
         <div class="logo"><div class="logo1"><img src="images/logo1.png" class="logoimg"></div>القهوة</div>
         <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
         <ul class="nav-links">
-            <li><a href="index.html">الرئيسية</a></li>
-            <li><a href="dashboard.html">الصالة</a></li>
-            <li><a href="profile.html">حسابي</a></li>
-        </ul>
+    <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+    <li><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+    <li><a href="profile.html"><i class="fa-solid fa-user"></i> حسابي</a></li>
+</ul>
         <div class="nav-right" id="navAuth"></div>
     </nav>
 
@@ -40,8 +40,91 @@
             </main>
         </div>
     </div>
+<script type="module">
+        import { auth, onAuthStateChanged, getNotifications, markNotificationRead } from './auth-service.js';
 
-    <script type="module">
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("User logged in, fetching notifications..."); // Debug
+                await loadNotifs();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function loadNotifs() {
+            const list = document.getElementById('notifList');
+            // Show loading state
+            list.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fa-solid fa-spinner fa-spin"></i> بنشوف الجديد...
+                </div>`;
+
+            const res = await getNotifications();
+            console.log("Notifications result:", res); // Debug
+
+            if (!res.success) {
+                list.innerHTML = `<div style="text-align: center; padding: 2rem; color: red;">
+                    <p>حصل خطأ في تحميل الإشعارات: ${res.error}</p>
+                </div>`;
+                return;
+            }
+            
+            if (res.data.length === 0) {
+                list.innerHTML = `<div style="text-align: center; padding: 3rem; color: var(--text-grey);">
+                    <i class="fa-regular fa-bell-slash" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>مفيش أخبار جديدة.</p>
+                </div>`;
+                return;
+            }
+
+            list.innerHTML = res.data.map(n => {
+                let icon = 'fa-info-circle';
+                let content = n.message;
+                let action = '';
+                let bgColor = n.read ? 'var(--bg-card)' : 'rgba(111, 78, 55, 0.05)'; // Highlight unread
+                
+                if (n.type === 'friend_request') {
+                    icon = 'fa-user-plus';
+                    action = `<button class="btn-primary" onclick="window.location.href='friends-requests.html'" style="font-size:0.8rem; padding: 5px 10px;">شوف الطلب</button>`;
+                } else if (n.type === 'game_invite') {
+                    icon = 'fa-gamepad';
+                    // Check game type to redirect correctly
+                    const link = n.gameType === 'chess' ? `games-chess.html?gameId=${n.gameId}` : `games-xo.html?gameId=${n.gameId}`;
+                    action = `<button class="btn-primary" onclick="window.location.href='${link}'" style="font-size:0.8rem; padding: 5px 10px;">العب</button>`;
+                } else if (n.type === 'request_accepted') {
+                    icon = 'fa-check-circle';
+                }
+
+                // Format timestamp safely
+                let timeStr = 'دلوقتي';
+                if (n.timestamp) {
+                    timeStr = new Date(n.timestamp.toDate()).toLocaleString('ar-EG', {
+                        day: 'numeric', month: 'short', hour: 'numeric', minute: 'numeric'
+                    });
+                }
+
+                return `
+                    <div class="uni-card" style="display:flex; gap:15px; align-items:center; padding:1.2rem; border-right: 4px solid ${n.read ? 'transparent' : 'var(--primary-blue)'}; background: ${bgColor}; margin-bottom: 10px; border-radius: 8px;">
+                        <div style="font-size:1.4rem; color:var(--primary-blue);"><i class="fa-solid ${icon}"></i></div>
+                        <div style="flex:1;">
+                            <p style="margin-bottom:4px; font-weight: ${n.read ? 'normal' : 'bold'};">${content}</p>
+                            <span style="font-size:0.75rem; color:var(--text-grey);">${timeStr}</span>
+                        </div>
+                        ${action}
+                    </div>
+                `;
+            }).join('');
+            
+            // Mark unread as read (in background)
+            res.data.forEach(async (n) => {
+                if(!n.read) {
+                    await markNotificationRead(n.id);
+                }
+            });
+        }
+    </script>
+    <!-- <script type="module">
         import { auth, onAuthStateChanged, getNotifications, markNotificationRead } from './auth-service.js';
 
         onAuthStateChanged(auth, async (user) => {
@@ -93,7 +176,7 @@
                 if(!n.read) markNotificationRead(n.id);
             });
         }
-    </script>
+    </script> -->
         <script type="module" src="profile-load.js"></script>
 
     <script src="script.js"></script>

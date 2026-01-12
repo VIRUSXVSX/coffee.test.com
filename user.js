@@ -145,14 +145,29 @@ async function setupFriendButton() {
         btnHtml = `<button class="btn-outline" style="width:100%; margin-top:1rem; cursor:default; opacity:0.7;"><i class="fa-regular fa-clock"></i> تم إرسال الطلب</button>`;
     } else if (status === 'pending_received') {
         btnHtml = `<button id="btnAcceptFriend" class="btn-primary" style="width:100%; margin-top:1rem; background:green;"><i class="fa-solid fa-check"></i> اقبل الطلب</button>`;
-    } else if (status === 'friends') {
+} else if (status === 'friends') {
         btnHtml = `
-            <div style="margin-top:1rem;">
-                <button class="btn-outline" style="width:100%; color:green; border-color:green; cursor:default; margin-bottom:5px;"><i class="fa-solid fa-check"></i> أصدقاء</button>
-                <button id="btnUnfriend" class="btn-outline" style="width:100%; color:red; border-color:red; font-size:0.8rem;"><i class="fa-solid fa-user-minus"></i> مسح من الشلة</button>
+            <div style="margin-top:1rem; display:flex; flex-direction:column; gap:8px;">
+                <button class="btn-outline" style="width:100%; color:green; border-color:green; cursor:default;"><i class="fa-solid fa-check"></i> أصدقاء</button>
+                
+                <button id="btnChat" class="btn-primary" style="width:100%; background: var(--primary-blue);">
+                    <i class="fa-regular fa-comments"></i> دردشة
+                </button>
+
+                <button id="btnUnfriend" class="btn-outline" style="width:100%; color:red; border-color:red; font-size:0.8rem;">
+                    <i class="fa-solid fa-user-minus"></i> مسح من الشلة
+                </button>
             </div>
         `;
     }
+    // } else if (status === 'friends') {
+    //     btnHtml = `
+    //         <div style="margin-top:1rem;">
+    //             <button class="btn-outline" style="width:100%; color:green; border-color:green; cursor:default; margin-bottom:5px;"><i class="fa-solid fa-check"></i> أصدقاء</button>
+    //             <button id="btnUnfriend" class="btn-outline" style="width:100%; color:red; border-color:red; font-size:0.8rem;"><i class="fa-solid fa-user-minus"></i> مسح من الشلة</button>
+    //         </div>
+    //     `;
+    // }
 
     container.innerHTML = btnHtml;
 
@@ -165,7 +180,13 @@ async function setupFriendButton() {
             setupFriendButton();
         });
     }
-
+const btnChat = document.getElementById('btnChat');
+    if (btnChat) {
+        btnChat.addEventListener('click', () => {
+            // Go to chat page with this user's ID
+            window.location.href = `chat.html?uid=${targetUserId}`;
+        });
+    }
     const btnAccept = document.getElementById('btnAcceptFriend');
     if (btnAccept) {
         btnAccept.addEventListener('click', async () => {

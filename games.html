@@ -8,49 +8,219 @@
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
     <script src="theme.js"></script>
+    
     <style>
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        .game-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 2rem;
+        /* --- Hero Section --- */
+        .games-hero {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-light) 100%);
+            padding: 3rem 1rem;
             text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: var(--radius);
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
         }
+
+        .games-hero::before {
+            content: '\f0f4'; /* Coffee icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            font-size: 10rem;
+            opacity: 0.05;
+            color: var(--primary-blue);
+            transform: rotate(-20deg);
+        }
+
+        .games-hero h1 {
+            color: var(--primary-blue);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        /* --- Grid Layout --- */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        /* --- Modern Game Card --- */
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
         .game-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
             border-color: var(--primary-blue);
         }
+
+        /* Card Header (Icon Area) */
+        .card-header {
+            background: radial-gradient(circle at center, rgba(111, 78, 55, 0.1) 0%, transparent 70%);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 180px;
+            position: relative;
+        }
+
         .game-icon {
-            font-size: 4rem;
+            font-size: 5rem;
             color: var(--primary-blue);
-            margin-bottom: 1rem;
-            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 5px 15px rgba(111, 78, 55, 0.3));
+            transition: transform 0.3s;
         }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.1) rotate(5deg);
         }
+
+        /* Floating Badge */
         .game-badge {
             position: absolute;
             top: 15px;
-            left: 15px;
-            background: #ffc107;
-            color: #4a3424;
-            padding: 5px 10px;
+            right: 15px; /* RTL fix */
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
+        .badge-new { background: #ffc107; color: #4a3424; }
+        .badge-hot { background: #e0245e; color: white; }
+        .badge-soon { background: var(--text-grey); color: white; }
+        .badge-pro { background: var(--primary-blue); color: white; }
+
+        /* Card Body */
+        .card-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            text-align: right; /* RTL alignment */
+        }
+
+        .game-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .game-desc {
+            color: var(--text-grey);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        /* Tags Row */
+        .game-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            background: var(--bg-light);
+            color: var(--text-grey);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Action Buttons */
+        .card-footer {
+            margin-top: auto;
+        }
+
+        .btn-play {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 12px;
+            font-weight: bold;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .btn-play:hover {
+            background: var(--primary-hover);
+            letter-spacing: 1px;
+        }
+
+        /* Disabled Card Style */
+        .game-card.disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+        }
+
+        .game-card.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            filter: grayscale(0); /* Add color on hover slightly */
+        }
+
+        .overlay-soon {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            backdrop-filter: blur(2px);
+        }
+
+        .soon-label {
+            background: var(--banner);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            transform: rotate(-10deg);
+            border: 2px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Dark Mode Adjustments */
+        [data-theme="dark"] .card-header {
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+        }
+        [data-theme="dark"] .overlay-soon {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .games-hero h1 { font-size: 2rem; }
+            .games-grid { grid-template-columns: 1fr; }
+            .game-icon { font-size: 4rem; }
         }
     </style>
 </head>
@@ -64,64 +234,131 @@
         </div>
         <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
         <ul class="nav-links">
-            <li><a href="index.html">الرئيسية</a></li>
-            <li><a href="dashboard.html">الصالة</a></li>
-            <li><a href="games.html" class="active">الألعاب</a></li>
-            <li><a href="profile.html">حسابي</a></li>
+            <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+            <li><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+            <li><a href="games.html" class="active"><i class="fa-solid fa-gamepad"></i> الألعاب</a></li>
+            <li><a href="profile.html"><i class="fa-solid fa-user"></i> حسابي</a></li>
         </ul>
         <div class="nav-right" id="navAuth"></div>
     </nav>
 
     <div class="container">
         
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <h1 style="color: var(--primary-blue); font-size: 2.5rem; margin-bottom: 1rem;">صالة التسلية 🎲</h1>
-            <p style="color: var(--text-grey); font-size: 1.1rem;">اشرب قهوتك والعب شوية.. المنافسة هنا حامية!</p>
+        <div class="games-hero">
+            <h1>صالة التسلية 🎲</h1>
+            <p style="color: var(--text-grey); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+                اشرب قهوتك والعب شوية.. هنا المكان اللي بنفصل فيه عن الدوشة.
+                نافس أصحابك أو العب مع الكمبيوتر.
+            </p>
         </div>
 
         <div class="games-grid">
             
-            <!-- XO Game Card -->
             <div class="game-card">
-                <span class="game-badge"><i class="fa-solid fa-fire"></i> الجديد</span>
-                <div class="game-icon">
-                    <i class="fa-solid fa-chess-board"></i>
+                <span class="game-badge badge-new">🔥 جديد</span>
+                <div class="card-header">
+                    <div class="game-icon">
+                        <i class="fa-solid fa-xmarks-lines"></i>
+                    </div>
                 </div>
-                <h2 style="margin-bottom: 0.5rem; color: var(--text-dark);">إكس أو المشاريب ❌⭕</h2>
-                <p style="color: var(--text-grey); margin-bottom: 1.5rem;">
-                    تحدي القهوة والشاي! العب ضد الكمبيوتر الذكي أو تحدى صاحبك جنبك. مين هيكسب المشاريب؟
-                </p>
-                
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button onclick="window.location.href='games-xo.html'" class="btn-primary" style="flex: 2;">
-                        <i class="fa-solid fa-play"></i> العب دلوقتي
-                    </button>
-                    <!-- <button onclick="shareGame('إكس أو المشاريب', 'games-xo.html')" class="btn-outline" style="flex: 1;" title="اعزم صاحبك">
-                        <i class="fa-solid fa-share-nodes"></i>
-                    </button> -->
+                <div class="card-body">
+                    <h3 class="game-title">إكس أو المشاريب ❌⭕</h3>
+                    <div class="game-tags">
+                        <span class="tag"><i class="fa-solid fa-user"></i> فردي</span>
+                        <span class="tag"><i class="fa-solid fa-user-group"></i> زوجي</span>
+                        <span class="tag"><i class="fa-solid fa-globe"></i> أونلاين</span>
+                    </div>
+                    <p class="game-desc">
+                        اللعبة الكلاسيكية بس بطعم القهوة. العب ضد الذكاء الاصطناعي أو تحدى اللي قاعد جنبك على المشاريب.
+                    </p>
+                    <div class="card-footer">
+                        <button onclick="window.location.href='games-xo.html'" class="btn-play">
+                            <i class="fa-solid fa-play"></i> العب الآن
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Future Game Placeholder -->
-            <div class="game-card" style="opacity: 0.7; cursor: not-allowed;">
-                <span class="game-badge" style="background: var(--text-grey); color: white;">قريباً</span>
-                <div class="game-icon" style="color: var(--text-grey);">
-                    <i class="fa-solid fa-puzzle-piece"></i>
+            <div class="game-card">
+                <span class="game-badge badge-pro">🏆 للمحترفين</span>
+                <div class="card-header">
+                    <div class="game-icon">
+                        <i class="fa-solid fa-chess-knight"></i>
+                    </div>
                 </div>
-                <h2 style="margin-bottom: 0.5rem; color: var(--text-grey);">لعبة السلم والثعبان</h2>
-                <p style="color: var(--text-grey); margin-bottom: 1.5rem;">
-                    قريباً على القهوة.. استنونا!
-                </p>
-                <button class="btn-outline" disabled style="width: 100%; border-color: transparent; background: #eee;">
-                    تحت الإنشاء 🚧
-                </button>
+                <div class="card-body">
+                    <h3 class="game-title">شطرنج المعلمين ♟️</h3>
+                    <div class="game-tags">
+                        <span class="tag"><i class="fa-solid fa-user-group"></i> زوجي</span>
+                        <span class="tag"><i class="fa-solid fa-globe"></i> أونلاين</span>
+                        <span class="tag"><i class="fa-solid fa-brain"></i> ذكاء</span>
+                    </div>
+                    <p class="game-desc">
+                        كش ملك! أثبت ذكائك في أقوى لعبة استراتيجية. متاح اللعب ضد الكمبيوتر أو أونلاين مع رواد القهوة.
+                    </p>
+                    <div class="card-footer">
+                        <button onclick="window.location.href='games-chess.html'" class="btn-play">
+                            <i class="fa-solid fa-play"></i> ابدأ التحدي
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card disabled">
+                <div class="overlay-soon">
+                    <div class="soon-label">🚧 تحت الإنشاء</div>
+                </div>
+                <div class="card-header">
+                    <div class="game-icon" style="opacity: 0.5;">
+                        <i class="fa-solid fa-stairs"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="game-title">السلم والثعبان 🐍</h3>
+                    <div class="game-tags">
+                        <span class="tag">🎲 حظ</span>
+                        <span class="tag">👥 جماعي</span>
+                    </div>
+                    <p class="game-desc">
+                        قريباً.. اللعبة اللي كلنا بنحبها. جهز الزهر واستنى التحديث الجاي!
+                    </p>
+                    <div class="card-footer">
+                        <button class="btn-play" style="background: var(--text-grey); cursor: not-allowed;">
+                            قريباً
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card disabled">
+                <div class="overlay-soon">
+                    <div class="soon-label">☕ قريباً</div>
+                </div>
+                <div class="card-header">
+                    <div class="game-icon" style="opacity: 0.5;">
+                        <i class="fa-solid fa-dice-four"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3 class="game-title">دومينو الأمريكاني 🁐</h3>
+                    <div class="game-tags">
+                        <span class="tag">🧠 تركيز</span>
+                        <span class="tag">🔥 حماس</span>
+                    </div>
+                    <p class="game-desc">
+                        الدومينو على أصولها. قفل على صاحبك وكسبه، قريباً جداً في التحديثات القادمة.
+                    </p>
+                    <div class="card-footer">
+                        <button class="btn-play" style="background: var(--text-grey); cursor: not-allowed;">
+                            قريباً
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
-
     </div>
 
-    <!-- Share Toast -->
     <div id="shareToast" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text-dark); color: white; padding: 10px 20px; border-radius: 20px; display: none; z-index: 2000;">
         تم نسخ رابط اللعبة! ابعته لصاحبك 😉
     </div>

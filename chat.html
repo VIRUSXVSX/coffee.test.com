@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - الدردشة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <!-- <nav class="navbar">
+        <div class="logo">
+            <div class="logo1"><img src="images/logo1.png" class="logoimg" alt="Logo"></div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="chat.html" class="active">الرسايل</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav> -->
+
+    <div class="container" style="max-width: 1400px; padding: 1rem;">
+        
+        <div id="chatContainer" class="chat-container">
+            
+            <aside class="chat-sidebar">
+                <div class="sidebar-header">
+                    <h3>المحادثات</h3>
+                    <div>
+                      <button class="icon-btn" title="الصالة"><a href="dashboard.html" class="active"><i class="fa-solid fa-mug-hot"></i></a></button>
+                        <!-- <button class="icon-btn" title="رسالة جديدة"><i class="fa-regular fa-pen-to-square"></i></button>
+                        <button class="icon-btn" title="تصفية"><i class="fa-solid fa-filter"></i></button> -->
+                    </div>
+                </div>
+                
+<div style="padding: 0 20px 15px 20px; position: relative;">
+    <div class="search-box-wrapper" style="background:var(--bg-light); padding:8px 15px; border-radius:20px; display:flex; align-items:center; border: 1px solid var(--border-color);">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--text-grey); margin-left:10px;"></i>
+        <input type="text" id="chatSearchBox" placeholder="دور على حد..." style="border:none; background:transparent; width:100%; color:var(--text-dark); outline:none;">
+        <i id="searchLoader" class="fa-solid fa-circle-notch fa-spin" style="color:var(--primary-blue); font-size:0.8rem; display:none;"></i>
+    </div>
+    
+    <div id="chatSearchResults" class="search-results-list" style="
+        display:none; 
+        position:absolute; 
+        top:100%; 
+        left:20px; 
+        right:20px; 
+        background:var(--bg-card); 
+        border:1px solid var(--border-color); 
+        border-radius:12px; 
+        box-shadow:0 5px 15px rgba(0,0,0,0.1); 
+        z-index:100; 
+        max-height:300px; 
+        overflow-y:auto; 
+        margin-top:5px;">
+    </div>
+</div>
+                <div id="chatList" class="chat-list">
+                    <div style="text-align:center; padding:20px; color:var(--text-grey);">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> تحميل...
+                    </div>
+                </div>
+            </aside>
+
+            <main class="chat-main" id="chatMainArea" style="display:none;"> 
+                
+                <div class="chat-main-header">
+                    <div class="header-user-info">
+                        <button id="backToChatList" class="icon-btn" style="display:none; font-size:1.2rem;">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <img id="chatHeaderImg" src="images/user.png">
+                        <div class="user-text">
+                            <h4 id="chatHeaderName">...</h4>
+                            <span id="onlineStatus">متصل</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 5px;">
+                        <!-- <button class="icon-btn"><i class="fa-solid fa-phone"></i></button>
+                        <button class="icon-btn"><i class="fa-solid fa-video"></i></button> -->
+                        <!-- <button class="icon-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button> -->
+                    </div>
+                </div>
+
+                <div id="messagesArea" class="chat-messages">
+                    <div style="text-align:center; margin-top:50px; opacity:0.6;">
+                        <img src="images/logo1.png" style="width:80px; opacity:0.5; margin-bottom:10px;">
+                        <p style="color:var(--text-grey);">اختار محادثة عشان تبدأ رغي</p>
+                    </div>
+                </div>
+
+<!-- <div id="chatInputContainer" class="chat-input-wrapper" style="position: relative;"> 
+    
+    <div class="input-pill">
+        <i id="btnEmojiToggle" class="fa-regular fa-face-smile input-icon" style="cursor: pointer;"></i>
+        
+        <input type="text" id="msgInput" placeholder="اكتب رسالة..." autocomplete="off">
+
+    </div>
+    
+    <button id="sendBtn" class="send-circle-btn">
+        <i class="fa-solid fa-paper-plane" style="margin-right:-2px;"></i>
+    </button>
+</div> -->
+<div id="chatInputContainer" class="chat-input-wrapper">
+    <!-- <button class="action-circle-btn"><i class="fa-solid fa-plus"></i></button> -->
+    
+    <div class="input-pill">
+        <i id="btnEmojiToggle" class="fa-regular fa-face-smile input-icon"></i>
+        
+        <textarea id="msgInput" placeholder="اكتب رسالة..." rows="1"></textarea>
+        
+        <!-- <i class="fa-solid fa-paperclip input-icon"></i>
+        <i class="fa-solid fa-camera input-icon" style="margin-right:8px;"></i> -->
+    </div>
+    
+    <button id="sendBtn" class="send-circle-btn">
+        <i class="fa-solid fa-paper-plane" style="margin-right:-2px;"></i>
+    </button>
+</div>
+            </main>
+            
+            <main class="chat-main" id="emptyState" style="display:flex; justify-content:center; align-items:center; background:var(--bg-light);">
+                <div style="text-align:center; color:var(--text-grey);">
+                    <div style="width:100px; height:100px; background:var(--bg-card); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px auto; border: 4px solid var(--border-color);">
+                        <i class="fa-solid fa-mug-hot fa-3x" style="color:var(--primary-blue);"></i>
+                    </div>
+                    <h3 style="color:var(--primary-blue); margin-bottom:10px;">أهلاً بيك في قهوتك</h3>
+                    <p>اختار حد من الشلة وابدأ الكلام</p>
+                </div>
+            </main>
+
+        </div>
+    </div>
+
+    <script type="module" src="chat.js"></script>
+    <script type="module" src="statues.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
