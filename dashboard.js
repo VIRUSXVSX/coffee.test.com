@@ -602,6 +602,7 @@ const REACTION_TYPES = {
 document.addEventListener('DOMContentLoaded', () => {
     injectStyles(); 
     createReactorsModal();
+    setupGahwajyAI();
 
     // تشغيل البحث الذكي (Smart Search)
     setupUserSearch();
@@ -609,9 +610,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // أداة الإصلاح (للاستخدام اليدوي عند الحاجة)
     window.fixSearch = fixAllUsersSearch; 
 
-    onAuthStateChanged(auth, (user) => {
+    // onAuthStateChanged(auth, (user) => {
+    //     if (user) {
+    //         currentUser = user;
+    //         const avatar = document.getElementById('userAvatarSmall');
+    //         if(avatar) avatar.src = user.photoURL || 'images/user.png';
+    //     } else {
+    //         window.location.href = 'login.html';
+    //     }
+    //     loadFeed();
+    // });
+onAuthStateChanged(auth, (user) => {
         if (user) {
             currentUser = user;
+            
+            // --- NEW: Share user info with the AI ---
+            window.currentGahwaUser = user; 
+            // ---------------------------------------
+
             const avatar = document.getElementById('userAvatarSmall');
             if(avatar) avatar.src = user.photoURL || 'images/user.png';
         } else {
@@ -619,7 +635,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         loadFeed();
     });
-
     const publishBtn = document.getElementById('publishBtn');
     if(publishBtn) publishBtn.addEventListener('click', handlePublish);
     
@@ -755,6 +770,16 @@ document.addEventListener('DOMContentLoaded', () => {
 //         currentFocus = -1;
 //     }
 // }
+
+
+
+
+
+
+
+
+
+
 // // ================= END SMART SEARCH =================
 // ================= SMART SEARCH SYSTEM (UPDATED) =================
 function setupUserSearch() {

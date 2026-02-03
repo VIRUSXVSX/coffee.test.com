@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="theme.js"></script>
+    <script type="module" src="user-load.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -23,6 +24,11 @@
     <div class="container">
         <div class="profile-layout">
             <aside class="profile-sidebar">
+                 <div class="profile-image-container">
+                    <img id="myAvatar" src="images/user.png" class="profile-img-lg">
+                </div>
+                                <h2 id="myName">...</h2>
+                                <br>
                 <ul class="profile-menu" style="margin-top:0;">
                     <li onclick="window.location.href='friends.html'"><i class="fa-solid fa-user-group"></i> الشلة (الأصدقاء)</li>
                     <li class="active" onclick="window.location.href='friends-requests.html'"><i class="fa-solid fa-user-plus"></i> طلبات الصداقة</li>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - مكتب الاستعلامات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet"/>
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+
+    <style>
+        /* --- Page Specific Styles (Search Center) --- */
+        
+        /* The Big Hero Section */
+        .search-hero {
+            background: var(--bg-card);
+            padding: 4rem 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Faint Background Icon */
+        .search-hero::before {
+            content: '\f002'; /* FontAwesome Search Icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: -20px;
+            left: -30px;
+            font-size: 15rem;
+            color: var(--primary-blue);
+            opacity: 0.03;
+            transform: rotate(20deg);
+            pointer-events: none;
+        }
+
+        .hero-title {
+            color: var(--primary-blue);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            position: relative;
+        }
+
+        .hero-subtitle {
+            color: var(--text-grey);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        /* The Giant Search Input */
+        .giant-search-box {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .giant-input {
+            width: 100%;
+            padding: 1.5rem 4rem 1.5rem 2rem;
+            font-size: 1.3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .giant-input:focus {
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 8px rgba(111, 78, 55, 0.15);
+            transform: scale(1.02);
+        }
+
+        .search-icon-float {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            opacity: 0.7;
+        }
+
+        /* --- Results Grid System --- */
+        .results-container {
+            min-height: 300px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* User Card Design */
+        .user-card-modern {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .user-card-modern:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .user-card-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--bg-light);
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-card-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-text);
+            margin-bottom: 5px;
+        }
+
+        .user-card-role {
+            background: rgba(111, 78, 55, 0.1);
+            color: var(--primary-blue);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .card-action-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-dark);
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .card-action-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* --- Status Messages (Empty/Loading) --- */
+        .status-box {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-grey);
+            grid-column: 1 / -1;
+        }
+
+        .status-box i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: var(--border-color);
+            display: block;
+        }
+
+        .status-box h3 {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        /* Highlight Logic */
+        .highlight-match {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 3px;
+            padding: 0 2px;
+            color: var(--text-dark);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading Spinner Animation */
+        .fa-spin-pulse {
+            animation: fa-spin 1s infinite steps(8);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+            <li><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+            <li><a href="fadfada.html"><i class="fa-solid fa-user-secret"></i> بير الأسرار</a></li>
+            <li><a href="games.html"><i class="fa-solid fa-gamepad"></i> الألعاب</a></li>
+            <li><a href="search.html" class="active"><i class="fa-solid fa-magnifying-glass"></i> الاستعلامات</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth">
+            </div>
+    </nav> -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+    <ul class="nav-links">
+    <!-- <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li> -->
+    <li><a href="dashboard.html" class=""><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+    <!-- <li><a href="fadfada.html"><i class="fa-solid fa-user-secret"></i> بير الأسرار</a></li>
+    <li><a href="games.html"><i class="fa-solid fa-gamepad"></i> الألعاب</a></li>
+    <li><a href="tv.html"><i class="ri-tv-line"></i> السينما</a></li> -->
+    <li><a href="search.html" class="active"><i class="fa-solid fa-magnifying-glass"></i> الاستعلامات</a></li>
+
+</ul>
+
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+    <div class="container">
+        
+        <div class="search-hero">
+            <h1 class="hero-title">مكتب الاستعلامات 🕵️‍♂️</h1>
+            <p class="hero-subtitle">يا ترى مين هنا؟ اكتب الاسم واحنا نجيبهولك من تحت الأرض</p>
+            
+            <div class="giant-search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon-float"></i>
+                <input type="text" id="bigSearchInput" class="giant-input" placeholder="بتدور على مين يا زميلي؟" autocomplete="off" autofocus>
+            </div>
+        </div>
+
+        <div class="results-container">
+            <div id="resultsGrid" class="results-grid">
+                
+                <div class="status-box">
+                    <i class="fa-regular fa-keyboard fa-bounce"></i>
+                    <h3>مستني إيه؟</h3>
+                    <p>اكتب اسم صاحبك أو جارك!</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // 1. IMPORT FROM YOUR EXISTING AUTH-SERVICE
+        // Ensure this file exists in the same folder
+        import { auth, onAuthStateChanged, searchUsers, getUserData } from './auth-service.js';
+
+        let currentUser = null;
+        let debounceTimer;
+
+        // // --- 2. AUTHENTICATION & NAVBAR LOGIC ---
+        // onAuthStateChanged(auth, async (user) => {
+        //     const navAuth = document.getElementById('navAuth');
+        //     if (user) {
+        //         currentUser = user;
+                
+        //         // Fetch extra user details (photo, name)
+        //         const userRes = await getUserData(user.uid);
+        //         const userData = userRes.success ? userRes.data : {};
+                
+        //         const name = userData.fullName || user.displayName || 'زبون';
+        //         const photo = userData.profileImage || user.photoURL || 'images/user.png';
+        //         const firstName = name.split(' ')[0];
+
+        //         navAuth.innerHTML = `
+        //             <div class="nav-profile-box" onclick="window.location.href='profile.html'">
+        //                 <img src="${photo}" class="nav-avatar-img" alt="Profile" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--primary-blue);">
+        //                 <span class="nav-username-text" style="font-weight:bold; color:var(--primary-blue); margin-right:5px;">${firstName}</span>
+        //             </div>
+        //         `;
+        //     } else {
+        //         navAuth.innerHTML = `
+        //             <a href="login.html" class="nav-login-btn btn-primary" style="text-decoration:none; color:white; padding:8px 20px;">
+        //                 <i class="fa-solid fa-right-to-bracket"></i> دخول
+        //             </a>
+        //         `;
+        //     }
+        // });
+
+        // --- 3. SEARCH LOGIC ---
+        const searchInput = document.getElementById('bigSearchInput');
+        const resultsGrid = document.getElementById('resultsGrid');
+
+        // Funny Loading Phrases
+        const qlshat = [
+            "بندور في الدفاتر القديمة...",
+            "بننده في الميكروفون...",
+            "اصبر دقيقة يا معلم...",
+            "جاري التمحيص والتدقيق...",
+            "بنسخن الرملة عشانك..."
+        ];
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim();
+            
+            // Clear previous timer (Debounce)
+            clearTimeout(debounceTimer);
+
+            // Empty State
+            if (!term) {
+                resultsGrid.innerHTML = `
+                    <div class="status-box">
+                        <i class="fa-regular fa-keyboard"></i>
+                        <h3>مستني إيه؟</h3>
+                        <p>اكتب اسم صاحبك، جارك، أو حتى اسمك انت شخصياً!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Show Loading State immediately
+            const randomQlsha = qlshat[Math.floor(Math.random() * qlshat.length)];
+            resultsGrid.innerHTML = `
+                <div class="status-box">
+                    <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--primary-blue)"></i>
+                    <h3>${randomQlsha}</h3>
+                </div>
+            `;
+
+            // Execute Search after 500ms
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await searchUsers(term);
+                    
+                    if (res.success && res.data.length > 0) {
+                        renderResults(res.data, term);
+                    } else {
+                        renderNoResults(term);
+                    }
+                } catch (error) {
+                    console.error("Search Error:", error);
+                    resultsGrid.innerHTML = `<div class="status-box" style="color:red"><h3>حصل خطأ!</h3><p>${error.message}</p></div>`;
+                }
+            }, 500);
+        });
+
+        function renderResults(users, term) {
+            // Remove current user from results (optional)
+            const filtered = currentUser ? users.filter(u => u.id !== currentUser.uid) : users;
+
+            if (filtered.length === 0) {
+                renderNoResults(term);
+                return;
+            }
+
+            resultsGrid.innerHTML = filtered.map(u => {
+                const img = u.profileImage || u.photoURL || 'images/user.png';
+                const role = u.role || 'زبون';
+                const name = u.fullName || 'مجهول';
+
+                // Highlight the matching part of the name
+                const regex = new RegExp(`(${term})`, "gi");
+                const highlightedName = name.replace(regex, `<span class="highlight-match">$1</span>`);
+
+                return `
+                    <div class="user-card-modern">
+                        <img src="${img}" class="user-card-img" onerror="this.src='images/user.png'">
+                        <div class="user-card-name">${highlightedName}</div>
+                        <span class="user-card-role">${role}</span>
+                        <div style="margin-top:15px;">
+                            <a href="user.html?uid=${u.id}" class="card-action-btn">
+                                <i class="fa-regular fa-id-card"></i> زيارة البروفايل
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderNoResults(term) {
+            resultsGrid.innerHTML = `
+                <div class="status-box">
+                    <i class="fa-regular fa-face-dizzy"></i>
+                    <h3>فص ملح وداب!</h3>
+                    <p>مفيش حد بالاسم ده "<b>${term}</b>" يا زميلي.<br>تأكد من الحروف أو جرب اسم الشهرة.</p>
+                </div>
+            `;
+        }
+
+        // --- 4. MOBILE MENU TOGGLE ---
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+        }
+    </script>
+    <script type="module" src="profile-load.js"></script>
+</body>
+</html>

@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+          <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet"/>
+
     <script src="theme.js"></script>
 </head>
 <body>
@@ -23,6 +25,30 @@
     <li><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
     <li><a href="profile.html" class="active"><i class="fa-solid fa-user"></i> حسابي</a></li>
 </ul>
+        <!-- <div class="nav-actions">
+            
+            <div class="notification-wrapper">
+                <button class="nav-icon-btn" id="notifToggleBtn">
+                    <i class="ri-notification-3-line"></i>
+                    <span class="notif-badge" id="notifBadge" style="display: none;">0</span>
+                </button>
+
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span>الإشعارات</span>
+                    </div>
+                    
+                    <div class="notif-list-mini" id="notifListMini">
+                        <div style="padding: 20px; text-align: center; color: var(--text-grey);">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+
+                    <a href="notifications.html" class="notif-footer-link">
+                        عرض كل الإشعارات <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div> -->
         <div class="nav-right" id="navAuth"></div>
     </nav>
 
@@ -112,5 +138,10 @@
     <script type="module" src="profile-load.js"></script>
     <script type="module" src="profile.js"></script>
     <script src="script.js"></script>
+        <script type="module" src="notifications.js"></script>
+        <script src="https://js.puter.com/v2/"></script>
+
+<script src="ai.js"></script>
+
 </body>
 </html>

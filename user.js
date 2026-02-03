@@ -251,7 +251,7 @@ function createPostHTML(post) {
     }
 
     return `
-        <div class="uni-card" id="post-${post.id}" style="border: 1px solid var(--border-color); padding: 0; margin-bottom: 1rem; border-radius: 8px; overflow:hidden;">
+        <div class="uni-card" id="post-${post.id}" style="border: 1px solid var(--border-color); padding: 0; margin-bottom: 1rem; border-radius: var(--radius); overflow:hidden;">
             <div class="uni-content" style="padding: 1.5rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                     <div style="display: flex; gap: 10px; align-items: center;">

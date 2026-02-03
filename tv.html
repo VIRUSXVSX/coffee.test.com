@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تلفزيون القهوة 📺</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <style>
+        /* نفس الستايل القديم مع إضافات */
+        body { background-color: #121212; color: white; overflow-x: hidden; }
+        .tv-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; padding: 20px; }
+        
+        /* تعديل عشان الشات ييجي جنب التلفزيون في الشاشات الكبيرة */
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            align-items: flex-start;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* التلفزيون */
+        .retro-tv {
+            flex: 2;
+            min-width: 300px;
+            position: relative;
+            background: #4e342e; padding: 20px; border-radius: 30px;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.6), 0 0 0 10px #3e2723;
+            display: flex; gap: 20px;
+        }
+        
+        /* الشات */
+        .chat-box {
+            flex: 1;
+            min-width: 280px;
+            height: 500px;
+            background: #222;
+            border-radius: 20px;
+            border: 4px solid #3e2723;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header { background: #3e2723; padding: 10px; text-align: center; font-weight: bold; }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-input-area { padding: 10px; background: #1a1a1a; display: flex; gap: 5px; }
+        .chat-input { flex: 1; padding: 8px; border-radius: 20px; border: none; background: #333; color: white; }
+        
+        /* رسائل الشات */
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; }
+        .msg.mine { background: var(--accent-yellow); color: black; align-self: flex-end; }
+        .msg.others { background: #444; color: white; align-self: flex-start; }
+        .msg-sender { font-size: 0.7rem; color: #ccc; margin-bottom: 2px; display: block; }
+
+        /* باقي ستايل التلفزيون القديم */
+        .tv-screen-frame { flex: 1; background: #000; border-radius: 20px; border: 5px solid #222; box-shadow: inset 0 0 20px rgba(0,0,0,1); position: relative; overflow: hidden; aspect-ratio: 16/9; }
+        .no-touch-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent; display: none; }
+        .paused-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; background: black; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .video-wrapper { width: 100%; height: 100%; }
+        .video-wrapper iframe, .video-wrapper video { width: 100%; height: 100%; object-fit: cover; border: none; }
+        .tv-side-panel { width: 180px; background: #3e2723; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; align-items: center; gap: 20px; border-left: 2px solid #5d4037; height: 100%; min-height: 400px; }
+        .channel-roller-container { position: relative; width: 100px; height: 100px; margin-bottom: 10px; }
+        .channel-knob { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #555, #222); border: 4px solid #111; box-shadow: 0 5px 15px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.3s; display: flex; align-items: center; justify-content: center; position: relative; }
+        .channel-knob::after { content: ''; position: absolute; top: 10px; width: 8px; height: 20px; background: var(--accent-yellow); border-radius: 4px; }
+        .speaker-grill { width: 100%; height: 80px; background: repeating-linear-gradient(90deg, #222, #222 2px, #3e2723 2px, #3e2723 6px); border-radius: 5px; margin-top: auto; border: 1px solid #111; }
+        .static-noise { position: absolute; top:0; left:0; width:100%; height:100%; background: url('https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif'); background-size: cover; opacity: 0.15; pointer-events: none; display: none; z-index: 5; }
+        .admin-panel { margin-top: 20px; background: #2c1810; padding: 15px; border-radius: 10px; width: 100%; max-width: 900px; display: none; border: 1px solid var(--accent-yellow); }
+
+        /* المودال (Popup) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
+        .modal-content { background-color: #2c1810; padding: 20px; border: 1px solid var(--accent-yellow); border-radius: 10px; width: 90%; max-width: 400px; text-align: center; color: white; max-height: 80vh; overflow-y: auto; }
+        .friend-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid #444; }
+        .friend-item img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        
+        /* زرار الريموت في قائمة المشاهدين */
+        .remote-btn { background: none; border: none; color: var(--accent-yellow); cursor: pointer; font-size: 1.1rem; }
+        .remote-btn:hover { color: white; }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; align-items: center; }
+            .retro-tv { width: 100%; flex-direction: column; }
+            .chat-box { width: 100%; height: 300px; }
+            .tv-side-panel { width: 100%; flex-direction: row; height: auto; min-height: auto; justify-content: space-around; }
+            .speaker-grill { display: none; }
+        }
+        /* --- ستايل مكان وضع اللينك (URL Input) --- */
+
+.url-input-group {
+    display: flex;
+    gap: 10px; /* مسافة بين الـ Input والزرار */
+    background: rgba(0, 0, 0, 0.3); /* خلفية غامقة شفافة */
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #3e2723; /* برواز بني غامق */
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.url-input-group input {
+    flex: 1; /* ياخد باقي المساحة المتاحة */
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #5d4037;
+    background: #1a1a1a; /* لون خلفية الـ Input */
+    color: white; /* لون الكتابة */
+    font-family: inherit; /* نفس فونت الموقع */
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* لما تدوس جوه الـ Input */
+.url-input-group input:focus {
+    border-color: var(--accent-yellow); /* يقلب دهبي */
+    box-shadow: 0 0 8px rgba(193, 154, 107, 0.3); /* توهج خفيف */
+    background: #222;
+}
+
+/* زرار "شغل" اللي جنب الـ Input */
+.url-input-group button {
+    padding: 10px 20px;
+    white-space: nowrap; /* الكلام ميتكسرش */
+    height: 100%; /* عشان يبقى نفس ارتفاع الـ Input تقريباً */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* ريسبونسيف للموبايل */
+@media (max-width: 600px) {
+    .url-input-group {
+        flex-direction: column; /* فوق بعض في الموبايل */
+        gap: 8px;
+    }
+    .url-input-group input, 
+    .url-input-group button {
+        width: 100%; /* العرض كامل */
+    }
+}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><div class="logo1"><img src="images/logo1.png" class="logoimg"></div>القهوة</div>
+        <!-- <div class="logo"><div class="logo1"><img src="images/logo1.png" class="logoimg"></div>القهوة TV</div> -->
+        <!-- <ul class="nav-links"> -->
+            <ul>
+            <li><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> رجوع للصالة</a></li>
+        <!-- </ul> --></ul>
+    </nav>
+
+    <div class="tv-container">
+        
+        <div id="setupArea" style="text-align: center; margin-top: -50px;">
+            <i class="fa-solid fa-tv fa-4x" style="color: var(--accent-yellow); margin-bottom: 20px;"></i>
+            <h1>سينما القهوة البلدي</h1>
+            <p style="color: #aaa; margin-bottom: 20px;">لمة الصحاب على فيلم حلو أو ماتش كورة</p>
+            <button id="createRoomBtn" class="btn-primary" style="font-size: 1.2rem; padding: 10px 30px;">
+                <i class="fa-solid fa-power-off"></i> شغل التلفزيون
+            </button>
+        </div>
+
+        <div id="tvArea" style="display: none; width: 100%; flex-direction: column; align-items: center;">
+            
+            <div class="main-layout">
+                <div class="retro-tv">
+                    <div class="tv-screen-frame">
+                        <div class="no-touch-overlay" id="viewerOverlay"></div>
+                        <div class="paused-overlay" id="pausedOverlay">
+                            <i class="fa-solid fa-pause fa-3x" style="color: var(--accent-yellow);"></i>
+                            <p style="margin-top: 10px;">المعلم وقف العرض</p>
+                        </div>
+                        <div class="static-noise" id="staticNoise"></div>
+                        <div class="video-wrapper" id="videoContainer"></div>
+                    </div>
+
+                    <div class="tv-side-panel">
+                        <div style="text-align: center;">
+                            <div class="channel-roller-container">
+                                <div class="channel-knob" id="channelKnob" title="لف البكرة عشان تقلب"></div>
+                            </div>
+                            <div class="knob-label">القناة: <span id="channelNum" style="color: var(--accent-yellow);">1</span></div>
+                        </div>
+
+                        <div id="powerLed" style="width: 15px; height: 15px; background: red; border-radius: 50%; box-shadow: 0 0 10px red; margin: 10px 0;"></div>
+
+                        <div style="text-align: center; font-size: 0.8rem; color: #aaa; width: 100%;">
+                            <div id="statusText">جاري التحميل...</div>
+                            <div style="margin-top: 10px; border-top: 1px solid #444; padding-top: 5px;">
+                                <span>المشاهدين:</span>
+                                <div id="viewersList" style="margin-top: 5px; max-height: 100px; overflow-y: auto;"></div>
+                            </div>
+                        </div>
+
+                        <div class="speaker-grill"></div>
+                    </div>
+                </div>
+
+                <div class="chat-box">
+                    <div class="chat-header"><i class="fa-regular fa-comments"></i> اللمة الحلوة</div>
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" class="chat-input" placeholder="قول حاجة..." autocomplete="off">
+                        <button id="sendChatBtn" class="btn-primary" style="padding: 5px 12px;"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="adminPanel" class="admin-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="color: var(--accent-yellow); margin: 0;"><i class="fa-solid fa-user-tie"></i> تحكم المعلم</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="inviteBtn" class="btn-primary" style="background: #2196F3;"><i class="fa-solid fa-user-plus"></i> اعزم صحابك</button>
+                        <button id="togglePlayBtn" class="btn-primary" style="background: #4CAF50;"><i class="fa-solid fa-stop"></i> وقف العرض</button>
+                    </div>
+                </div>
+                
+                <div class="url-input-group">
+                    <input type="text" id="customUrlInput" placeholder="حط لينك يوتيوب أو فيديو مباشر...">
+                    <button id="playCustomBtn" class="btn-primary">شغل</button>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-outline" onclick="changeChannel(1)" style="color: white; border-color: #555;">1. ماتشات</button>
+                    <button class="btn-outline" onclick="changeChannel(2)" style="color: white; border-color: #555;">2. قرآن</button>
+                    <button class="btn-outline" onclick="changeChannel(3)" style="color: white; border-color: #555;">3. أفلام</button>
+                    <button class="btn-outline" onclick="changeChannel(4)" style="color: white; border-color: #555;">4. أغاني</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="inviteModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px; color: var(--accent-yellow);">اعزم الشلة</h3>
+            <div id="friendsListContainer">
+                <p>بنجيب الصحاب...</p>
+            </div>
+            <button onclick="document.getElementById('inviteModal').style.display='none'" class="btn-outline" style="margin-top: 15px; width: 100%; border-color: #555; color: white;">قفل</button>
+        </div>
+    </div>
+
+    <script type="module" src="tv.js"></script>
+</body>
+</html>

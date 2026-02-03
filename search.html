@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - الاستعلامات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet"/>
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+
+    <style>
+        /* --- Compact Search Styles --- */
+        
+        .search-header-container {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-text h2 {
+            font-size: 1.4rem;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-text p {
+            font-size: 0.9rem;
+            color: var(--text-grey);
+            margin: 0;
+        }
+
+        /* Standard Size Search Input */
+        .search-box-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .modern-input {
+            width: 100%;
+            padding: 10px 15px 10px 40px; /* Left padding for icon */
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            height: 45px; /* Standard button height */
+            transition: 0.2s;
+        }
+
+        .modern-input:focus {
+            border-color: var(--primary-blue);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
+        }
+
+        .search-icon-small {
+            position: absolute;
+            left: 15px; /* Arabic RTL: Left side */
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-grey);
+            font-size: 1rem;
+        }
+
+        /* --- Results Grid (Compact) --- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Smaller cards */
+            gap: 15px;
+        }
+
+        /* Compact User Card */
+        .user-card-compact {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user-card-compact:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-card-img-sm {
+            width: 60px; /* Much smaller than before */
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .user-info h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: var(--text-dark);
+        }
+
+        .user-role-badge {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: var(--text-grey);
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .btn-visit {
+            margin-top: auto; /* Push to bottom */
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            width: 100%;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--primary-blue);
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-visit:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Status Messages */
+        .status-mini {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-grey);
+            background: rgba(0,0,0,0.02);
+            border-radius: 12px;
+        }
+        .status-mini i { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .status-mini h3 { font-size: 1.1rem; margin: 0; }
+
+        .highlight-match {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 3px;
+            color: var(--text-dark);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Mobile Adjustment */
+        @media (max-width: 600px) {
+            .search-header-container {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .header-text h2 { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="dashboard.html" class=""><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+            <li><a href="search.html" class="active"><i class="fa-solid fa-magnifying-glass"></i> الاستعلامات</a></li>
+        </ul>
+
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        
+        <div class="search-header-container">
+            <div class="header-text">
+                <h2><i class="fa-solid fa-magnifying-glass"></i> مكتب الاستعلامات</h2>
+                <p>دور على صحابك في السريع</p>
+            </div>
+            
+            <div class="search-box-wrapper">
+                <input type="text" id="searchInput" class="modern-input" placeholder="بحث بالاسم..." autocomplete="off" autofocus>
+                <i class="fa-solid fa-search search-icon-small"></i>
+            </div>
+        </div>
+
+        <div id="resultsGrid" class="results-grid">
+            
+            <div class="status-mini">
+                <i class="fa-regular fa-keyboard"></i>
+                <h3>اكتب الاسم عشان ندور في الدفاتر..</h3>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { auth, searchUsers } from './auth-service.js';
+
+        const searchInput = document.getElementById('searchInput');
+        const resultsGrid = document.getElementById('resultsGrid');
+        let currentUser = auth.currentUser;
+        let debounceTimer;
+
+        // Keep local user reference updated
+        auth.onAuthStateChanged(user => currentUser = user);
+
+        const qlshat = [
+            "ثانية واحدة...",
+            "بندورلك عليه...",
+            "اصبر دقيقة...",
+            "جاري البحث..."
+        ];
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim();
+            clearTimeout(debounceTimer);
+
+            if (!term) {
+                resultsGrid.innerHTML = `
+                    <div class="status-mini">
+                        <i class="fa-regular fa-keyboard"></i>
+                        <h3>اكتب الاسم عشان ندور في الدفاتر..</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            // Small Loading State
+            resultsGrid.innerHTML = `
+                <div class="status-mini">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <h3>${qlshat[Math.floor(Math.random() * qlshat.length)]}</h3>
+                </div>
+            `;
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await searchUsers(term);
+                    
+                    if (res.success && res.data.length > 0) {
+                        renderResults(res.data, term);
+                    } else {
+                        resultsGrid.innerHTML = `
+                            <div class="status-mini">
+                                <i class="fa-regular fa-face-meh"></i>
+                                <h3>مفيش حد بالاسم ده يا معلم</h3>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }, 500);
+        });
+
+        function renderResults(users, term) {
+            const filtered = currentUser ? users.filter(u => u.id !== currentUser.uid) : users;
+
+            if (filtered.length === 0) {
+                resultsGrid.innerHTML = `
+                    <div class="status-mini">
+                        <i class="fa-solid fa-user-slash"></i>
+                        <h3>مفيش نتايج</h3>
+                    </div>`;
+                return;
+            }
+
+            resultsGrid.innerHTML = filtered.map(u => {
+                const img = u.profileImage || u.photoURL || 'images/user.png';
+                const name = u.fullName || 'مجهول';
+                
+                // Highlight Logic
+                const regex = new RegExp(`(${term})`, "gi");
+                const highlightedName = name.replace(regex, `<span class="highlight-match">$1</span>`);
+
+                return `
+                    <div class="user-card-compact">
+                        <img src="${img}" class="user-card-img-sm" onerror="this.src='images/user.png'">
+                        <div class="user-info">
+                            <h4>${highlightedName}</h4>
+                            <span class="user-role-badge">${u.role || 'زبون'}</span>
+                        </div>
+                        <a href="user.html?uid=${u.id}" class="btn-visit">
+                            زيارة البروفايل <i class="fa-solid fa-arrow-left" style="font-size:0.7rem"></i>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Mobile Menu
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+        }
+    </script>
+    
+    <script type="module" src="profile-load.js"></script>
+</body>
+</html>

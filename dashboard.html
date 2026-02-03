@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>القهوة - الصالة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+            <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="style.css">
     <script src="theme.js"></script>
     <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
@@ -21,17 +24,85 @@
     <ul class="nav-links">
     <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
     <li><a href="dashboard.html" class="active"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
-    <li><a href="fadfada.html"><i class="fa-solid fa-user-secret"></i> بير الأسرار</a></li>
+        <li><a href="search.html" class=""><i class="fa-solid fa-magnifying-glass"></i> الاستعلامات</a></li>
+    <!-- <li><a href="fadfada.html"><i class="fa-solid fa-user-secret"></i> بير الأسرار</a></li> -->
     <li><a href="games.html"><i class="fa-solid fa-gamepad"></i> الألعاب</a></li>
-    <!-- <li><a href="profile.html"><i class="fa-solid fa-user"></i> حسابي</a></li> -->
+    <li><a href="tv.html"><i class="ri-tv-line"></i> السينما</a></li>
 </ul>
+
         <div class="nav-right" id="navAuth"></div>
     </nav>
+<!-- <nav class="glass-nav">
+    <div class="nav-container">
+        <a href="index.html" class="nav-brand">
+            <img src="images/logo1.png" alt="Logo" class="brand-logo">
+            <span class="brand-text">القهوة</span>
+        </a>
 
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="ri-home-4-fill"></i>
+                    <span class="link-text">الرئيسية</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="fadfada.html" class="nav-link">
+                    <i class="ri-ghost-smile-line"></i>
+                    <span class="link-text">فضفضة</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="games.html" class="nav-link">
+                    <i class="ri-gamepad-line"></i>
+                    <span class="link-text">لعب</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="friends.html" class="nav-link">
+                    <i class="ri-group-line"></i>
+                    <span class="link-text">الشلة</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="nav-actions">
+            
+            <div class="notification-wrapper">
+                <button class="nav-icon-btn" id="notifToggleBtn">
+                    <i class="ri-notification-3-line"></i>
+                    <span class="notif-badge" id="notifBadge" style="display: none;">0</span>
+                </button>
+
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span>الإشعارات</span>
+                    </div>
+                    
+                    <div class="notif-list-mini" id="notifListMini">
+                        <div style="padding: 20px; text-align: center; color: var(--text-grey);">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+
+                    <a href="notifications.html" class="notif-footer-link">
+                        عرض كل الإشعارات <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div id="navAuth" class="auth-box"></div>
+
+            <button class="mobile-toggle-btn">
+                <i class="ri-menu-4-line"></i>
+            </button>
+        </div>
+    </div>
+</nav> -->
     <div class="container">
         
         <!-- Welcome Banner -->
-        <div style="background: var(--banner); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; text-align: center; border: 1px solid var(--border-color);">
+        <div style="background: var(--banner); padding: 2rem; border-radius: var(--radius); margin-bottom: 2rem; text-align: center; border: 1px solid var(--border-color);">
             <!-- ID MUST MATCH greetings.js -->
             <h2 id="welcomeText" style="color: var(--primary-text); font-size: 1.8rem; margin-bottom: 0.5rem;">يا هلا بيك يا معلم</h2>
             <p style="color: var(--text-dark);">المكان مكانك.. اطلب واتمنى</p>
@@ -55,18 +126,25 @@
 
                 <div class="filter-group">
                     <h3><i class="fa-solid fa-bars"></i> قائمة المشاريب</h3>
+                    <br>
                     <ul style="list-style: none;">
-                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--primary-blue); background: rgba(111, 78, 55, 0.1); font-weight: bold; margin-bottom: 5px;" onclick="window.location.href='dashboard.html'">
+                        <li style="padding: 12px; border-radius: var(--radius); cursor: pointer; color: var(--primary-blue); background: rgba(111, 78, 55, 0.1); font-weight: bold; margin-bottom: 5px;" onclick="window.location.href='dashboard.html'">
                             <i class="fa-solid fa-fire"></i> الكل (التريند)
                         </li>
-                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey); margin-bottom: 5px;" onclick="window.location.href='games.html'">
+                        <li style="padding: 12px; border-radius: var(--radius); cursor: pointer; color: var(--text-grey); margin-bottom: 5px;" onclick="window.location.href='games.html'">
                             <i class="fa-solid fa-gamepad"></i> الألعاب
                         </li>
-                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey);" onclick="window.location.href='friends.html'">
+                        <li style="padding: 12px; border-radius: var(--radius); cursor: pointer; color: var(--text-grey); margin-bottom: 5px;" onclick="window.location.href='tv.html'">
+                            <i class="ri-tv-line"></i> السينما
+                        </li>
+                        <li style="padding: 12px; border-radius: var(--radius); cursor: pointer; color: var(--text-grey);" onclick="window.location.href='friends.html'">
                             <i class="fa-solid fa-user-group"></i> شلة الصحاب
                         </li>
-                        <li style="padding: 12px; border-radius: 8px; cursor: pointer; color: var(--text-grey);" onclick="window.location.href='fadfada.html'">
+                        <!-- <li style="padding: 12px; border-radius: var(--radius); cursor: pointer; color: var(--text-grey);" onclick="window.location.href='fadfada.html'">
                        <i class="fa-solid fa-user-secret"></i>    بير الأسرار
+                        </li> -->
+                        <li style="padding: 12px; border-radius: var(--radius); cursor: pointer; color: var(--text-grey);" onclick="window.location.href='notifications.html'">
+                       <i class="fa-solid fa-bell"></i> الإشعارات
                         </li>
                     </ul>
                 </div>
@@ -92,20 +170,390 @@
                         <p style="margin-top: 15px;">بنسخن الرملة...</p>
                     </div>
                 </div>
-<button id="scrollToTopBtn" title="Go to top"><i class="fa-solid fa-up-long"></i></button>
+<!-- <button id="scrollToTopBtn" title="Go to top"><i class="fa-solid fa-up-long"></i></button> -->
 <!-- <button id="scrollToTopBtn" title="Go to top">⬆️</button> -->
 
             </main> 
         </div>
     </div>
+
+
+<button id="aiToggleBtn" title="القهوجي الذكي">
+    <i class="ri-bard-fill"></i>
+</button>
+
+<div class="ai-chat-widget" id="aiChatWidget">
+    <div class="ai-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="ai-avatar">
+                <i class="fa-solid fa-mug-hot"></i>
+            </div>
+            <div>
+                <h4 style="margin: 0; color: white;">القهوجي الذكي</h4>
+                <span style="font-size: 0.7rem; color: #eee; opacity: 0.8;">مدعوم من Puter.js</span>
+            </div>
+        </div>
+        <button id="closeAiBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    
+    <div class="ai-messages" id="aiMessagesArea">
+        <div class="ai-msg-row received">
+            <div class="ai-msg-bubble">
+                أحلى مسا عليك يا كبير! ☕<br>
+                أنا القهوجي بتاع القهوة اطلب واتمنى يا باشا.
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-input-area">
+        <input type="text" id="aiInput" placeholder="اكتب للقهوجي..." autocomplete="off">
+        <button id="sendAiBtn"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+</div>
+
+    
+<button id="scrollToTopBtn" title="Go to top"><i class="fa-solid fa-up-long"></i></button>
+<!-- <button id="scrollToTopBtn" title="Go to top">⬆️</button> -->
+ <script>
+    // Get the button
+let mybutton = document.getElementById("scrollToTopBtn");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    mybutton.style.display = "block";
+  } else {
+    mybutton.style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+mybutton.onclick = function() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // This makes the scroll smooth
+  });
+};
+</script>
+<!-- <script>
+    // --- GAHWAJY AI SYSTEM (Powered by Puter.js) ---
+function setupGahwajyAI() {
+    const toggleBtn = document.getElementById('aiToggleBtn');
+    const widget = document.getElementById('aiChatWidget');
+    const closeBtn = document.getElementById('closeAiBtn');
+    const sendBtn = document.getElementById('sendAiBtn');
+    const input = document.getElementById('aiInput');
+    const msgArea = document.getElementById('aiMessagesArea');
+
+    if(!toggleBtn || !widget) return;
+
+    toggleBtn.addEventListener('click', () => widget.classList.add('active'));
+    closeBtn.addEventListener('click', () => widget.classList.remove('active'));
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        // عرض رسالة المستخدم
+        addMessage(text, 'sent');
+        input.value = '';
+
+        // علامة التحميل
+        const loadingId = addLoadingBubble();
+
+        try {
+            // هنا بننده على Puter
+            const reply = await getPuterResponse(text);
+            removeMessage(loadingId);
+            addMessage(reply, 'received');
+        } catch (error) {
+            removeMessage(loadingId);
+            addMessage("معلش يا باشا النت قطع أو السيرفر مشغول. جرب تاني.", 'received');
+            console.error(error);
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function addMessage(text, type) {
+        const div = document.createElement('div');
+        div.className = `ai-msg-row ${type}`;
+        // تحويل الروابط للينكات لو موجودة
+        const formattedText = text.replace(/\n/g, '<br>');
+        div.innerHTML = `<div class="ai-msg-bubble">${formattedText}</div>`;
+        msgArea.appendChild(div);
+        msgArea.scrollTop = msgArea.scrollHeight;
+    }
+
+    function addLoadingBubble() {
+        const id = 'loading-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = 'ai-msg-row received';
+        div.innerHTML = `<div class="ai-msg-bubble"><i class="fa-solid fa-mug-hot fa-bounce"></i></div>`;
+        msgArea.appendChild(div);
+        msgArea.scrollTop = msgArea.scrollHeight;
+        return id;
+    }
+
+    function removeMessage(id) {
+        const el = document.getElementById(id);
+        if(el) el.remove();
+    }
+}
+// --- دالة المخ (Puter AI Logic) - نسخة الملاحة الذكية ---
+async function getPuterResponse(userText) {
+    if (typeof puter === 'undefined') {
+        return "يا باشا مكتبة القهوة مش شغالة، اتأكد إنك ضفت السكريبت في الـ HTML.";
+    }
+
+    // خريطة الموقع عشان الذكاء الاصطناعي يفهم
+    const siteMap = `
+    معلومات عن الموقع تساعدك في الرد:
+    1. صفحة الألعاب (فيها شطرنج و XO) -> الرابط: "games.html"
+    2. صفحة الفضفضة والأسرار -> الرابط: "fadfada.html"
+    3. صفحة الأصدقاء والبحث -> الرابط: "friends.html"
+    4. الصفحة الشخصية -> الرابط: "profile.html"
+    5. الصفحة الرئيسية (الصالة) -> الرابط: "dashboard.html"
+    `;
+
+    // تجهيز الشخصية + التعليمات
+    const prompt = `
+    ${siteMap}
+
+    تصرف وكأنك "قهوجي" مصري (Barista) في موقع تواصل اجتماعي اسمه "القهوة".
+    - اسمك "القهوجي الذكي".
+    - اتكلم باللهجة المصرية العامية.
+    - خليك خدوم ودمك خفيف.
+    
+    *** تعليمات هامة جداً (Action Buttons): ***
+    - لو الزبون طلب حاجة ليها صفحة (زي لعب، شطرنج، فضفضة، صحاب)، لازم ترد عليه بكلمتين حلوين وبعدين تحطله زرار HTML يوديه للصفحة دي.
+    - شكل الزرار لازم يكون كده بالظبط: 
+    <br><a href="رابط_الصفحة" class="ai-link-btn"><i class="fa-solid fa-link"></i> النص_هنا</a>
+    
+    مثال: لو قال "عايز ألعب"، رد عليه: "يا سلام؟ ده ملعبي! تعالى نلعب دور." <br><a href="games.html" class="ai-link-btn"><i class="fa-solid fa-gamepad"></i> يلا نلعب</a>
+
+    الزبون بيقولك: "${userText}"
+    `;
+
+    const response = await puter.ai.chat(prompt);
+
+    if (typeof response === 'object' && response.message) {
+        return response.message.content;
+    } else {
+        return response.toString();
+    }
+}
+// // --- دالة المخ (Puter AI Logic) ---
+// async function getPuterResponse(userText) {
+//     // التحقق من وجود مكتبة القهوة (Puter سابقا)
+//     if (typeof puter === 'undefined') {
+//         return "يا باشا مكتبة القهوة مش شغالة، اتأكد إنك ضفت السكريبت في الـ HTML.";
+//     }
+
+//     // تجهيز الشخصية (System Prompt)
+//     const prompt = `
+//     تصرف وكأنك "قهوجي" مصري (Barista) في موقع تواصل اجتماعي اسمه "القهوة".
+//     - اسمك "القهوجي الذكي" أو "القهوة".
+//     - اتكلم باللهجة المصرية العامية (Slang).
+//     - خليك لطيف وخدوم ودمك خفيف.
+//     - استخدم كلمات زي: "يا باشا"، "يا معلم"، "يا هندسة"، "من عيوني".
+//     - ردودك تكون قصيرة ومفيدة (مش مقالات).
+    
+//     الزبون بيقولك: "${userText}"
+//     `;
+
+//     // استدعاء الذكاء الاصطناعي
+//     const response = await puter.ai.chat(prompt);
+
+//     // التأكد من الرد
+//     if (typeof response === 'object' && response.message) {
+//         return response.message.content;
+//     } else {
+//         return response.toString();
+//     }
+// }
+
+</script> -->
+
+
+
+
+
+
+
+
+
+<script>
+// --- GLOBAL MEMORY FOR AI (ذاكرة السمكة بقت ذاكرة فيل) ---
+let conversationHistory = [];
+
+// --- GAHWAJY AI SYSTEM (Powered by Puter.js) ---
+function setupGahwajyAI() {
+    const toggleBtn = document.getElementById('aiToggleBtn');
+    const widget = document.getElementById('aiChatWidget');
+    const closeBtn = document.getElementById('closeAiBtn');
+    const sendBtn = document.getElementById('sendAiBtn');
+    const input = document.getElementById('aiInput');
+    const msgArea = document.getElementById('aiMessagesArea');
+
+    if(!toggleBtn || !widget) return;
+
+    toggleBtn.addEventListener('click', () => widget.classList.add('active'));
+    closeBtn.addEventListener('click', () => widget.classList.remove('active'));
+
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        // 1. Show User Message
+        addMessage(text, 'sent');
+        input.value = '';
+
+        // 2. Add to History (Store what user said)
+        conversationHistory.push({ role: 'user', content: text });
+
+        // 3. Show Loading
+        const loadingId = addLoadingBubble();
+
+        try {
+            // 4. Call the Smart Brain
+            const reply = await getPuterResponse();
+            
+            removeMessage(loadingId);
+            
+            // 5. Show AI Reply
+            addMessage(reply, 'received');
+
+            // 6. Add to History (Store what AI said)
+            conversationHistory.push({ role: 'assistant', content: reply });
+
+        } catch (error) {
+            removeMessage(loadingId);
+            addMessage("معلش يا باشا النت قطع أو السيرفر مشغول. جرب تاني.", 'received');
+            console.error(error);
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function addMessage(text, type) {
+        const div = document.createElement('div');
+        div.className = `ai-msg-row ${type}`;
+        // Convert newlines to breaks
+        const formattedText = text.replace(/\n/g, '<br>');
+        div.innerHTML = `<div class="ai-msg-bubble">${formattedText}</div>`;
+        msgArea.appendChild(div);
+        msgArea.scrollTop = msgArea.scrollHeight;
+    }
+
+    function addLoadingBubble() {
+        const id = 'loading-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = 'ai-msg-row received';
+        div.innerHTML = `<div class="ai-msg-bubble"><i class="fa-solid fa-mug-hot fa-bounce"></i></div>`;
+        msgArea.appendChild(div);
+        msgArea.scrollTop = msgArea.scrollHeight;
+        return id;
+    }
+
+    function removeMessage(id) {
+        const el = document.getElementById(id);
+        if(el) el.remove();
+    }
+}
+
+// --- THE SMART BRAIN (Logic) ---
+async function getPuterResponse() {
+    if (typeof puter === 'undefined') {
+        return "يا باشا مكتبة القهوة مش شغالة، اتأكد إنك ضفت السكريبت في الـ HTML.";
+    }
+
+    // 1. Get User Name from Firebase (via dashboard.js)
+    // If name is missing, default to 'زبون'
+    let userName = "زبون";
+    if (window.currentGahwaUser && window.currentGahwaUser.displayName) {
+        userName = window.currentGahwaUser.displayName.split(' ')[0]; // Take first name only
+    }
+
+    // 2. Site Map for Context
+    const siteMap = `
+    معلومات عن الموقع تساعدك في الرد:
+    1. صفحة الألعاب (فيها شطرنج و XO) -> الرابط: "games.html"
+    2. صفحة الفضفضة والأسرار -> الرابط: "fadfada.html"
+    3. صفحة الأصدقاء والبحث -> الرابط: "friends.html"
+    4. الصفحة الشخصية -> الرابط: "profile.html"
+    5. الصفحة الرئيسية (الصالة) -> الرابط: "dashboard.html"
+    `;
+
+    // 3. Format History for the Prompt (Last 6 messages only to save tokens)
+    // We convert the array [{role: 'user', content: 'hi'}] into a text script.
+    const recentHistory = conversationHistory.slice(-6); 
+    let chatContext = "";
+    recentHistory.forEach(msg => {
+        const roleName = msg.role === 'user' ? "الزبون" : "القهوجي";
+        chatContext += `${roleName}: ${msg.content}\n`;
+    });
+
+    // 4. The Master Prompt
+    const prompt = `
+    ${siteMap}
+
+    أنت الآن "القهوجي الذكي" في موقع "القهوة".
+    
+    معلومات الزبون:
+    - اسم الزبون: ${userName}
+    
+    التعليمات:
+    1. اتكلم باللهجة المصرية العامية الصميمة.
+    2. نادِ الزبون أحياناً باسمه "${userName}"، وأحياناً بلقب "يا معلم" أو "يا كبير" أو "يا زبون".
+    3. خليك خدوم ومرح، كأنك شغال في قهوة بلدي.
+    4. ذاكرة الحوار السابق موجودة أدناه، كمل عليها بشكل طبيعي.
+
+    *** تعليمات هامة جداً (Action Buttons): ***
+    - لو الزبون طلب حاجة ليها صفحة (لعب، شطرنج، فضفضة)، حطله زرار HTML يوديه للصفحة دي.
+    - شكل الزرار: <br><a href="رابط_الصفحة" class="ai-link-btn"><i class="fa-solid fa-link"></i> النص_هنا</a>
+
+    --- بداية الحوار السابق ---
+    ${chatContext}
+    --- نهاية الحوار السابق ---
+
+    القهوجي (أنت) هترد تقول إيه؟:
+    `;
+
+    const response = await puter.ai.chat(prompt);
+
+    if (typeof response === 'object' && response.message) {
+        return response.message.content;
+    } else {
+        return response.toString();
+    }
+}
+</script>
+
 <script>
 
 </script>
+
+
+
+
+
+<script src="https://js.puter.com/v2/"></script>
     <!-- Scripts -->
     <script type="module" src="profile-load.js"></script>
     <script type="module" src="dashboard.js"></script>
     <script src="script.js"></script>
-    
+    <script type="module" src="notifications.js"></script>
     <!-- FIXED: Added type="module" so imports work -->
     <script type="module" src="greetings.js"></script>
 </body>

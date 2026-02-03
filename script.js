@@ -47,3 +47,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Mobile Menu Toggle
+const mobileBtn = document.querySelector('.mobile-toggle-btn');
+const navMenu = document.querySelector('.nav-menu');
+
+if(mobileBtn) {
+    mobileBtn.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+        // Toggle Icon
+        const icon = mobileBtn.querySelector('i');
+        if(navMenu.classList.contains('active')){
+            icon.classList.remove('ri-menu-4-line');
+            icon.classList.add('ri-close-line');
+        } else {
+            icon.classList.add('ri-menu-4-line');
+            icon.classList.remove('ri-close-line');
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

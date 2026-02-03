@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - مين احنا؟</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+
+    <!-- <style>
+        /* --- 1. General About Styles --- */
+        .about-header {
+            text-align: center;
+            padding: 4rem 1rem 2rem;
+        }
+
+        .about-header h1 {
+            color: var(--primary-blue);
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        /* --- 2. Story Section --- */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 5rem;
+        }
+
+        .about-text h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            border-right: 5px solid var(--accent-yellow);
+            padding-right: 15px;
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            color: var(--text-grey);
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .about-img-container {
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 5px solid white;
+            /* border: 5px solid var(--bg-card); */
+            transform: rotate(-2deg);
+            transition: 0.3s;
+        }
+        .about-img-container:hover { transform: rotate(0deg) scale(1.02); }
+
+        .about-img-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+/* --- Brand Logo Section (Clean & Stable Background) --- */
+.brand-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 4rem 2rem; /* More breathing room */
+    text-align: center;
+    margin-bottom: 5rem;
+    box-shadow: var(--shadow-lg); /* Deeper shadow for stability */
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- The Logo Container --- */
+.brand-logo-large {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    z-index: 1;
+    /* Grounding shadow - makes it look solidly placed on the surface */
+    filter: drop-shadow(0 8px 10px rgba(111, 78, 55, 0.3));
+    cursor: pointer; /* Suggests interaction */
+}
+
+/* --- The Fun Animations --- */
+
+/* 1. The Cup Body (Solid & Jiggles on Hover) */
+/* .cup-body {
+    fill: var(--primary-blue);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+} */
+/* --- The Fun Animations --- */
+
+/* 1. The Cup Body (Solid & Jiggles on Hover OR Tap) */
+.cup-body {
+    fill: var(--primary-blue);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Update this rule to include .tap-active */
+.brand-logo-large:hover .cup-body,
+.brand-logo-large.tap-active .cup-body {
+    animation: happy-jiggle 0.6s ease-in-out infinite alternate;
+}
+/* When hovering the whole SVG container, jiggle the cup body */
+.brand-logo-large:hover .cup-body {
+    animation: happy-jiggle 0.6s ease-in-out infinite alternate;
+}
+
+/* 2. The Steam (Wavy & Cute) */
+.steam-path {
+    fill: none;
+    stroke: var(--accent-yellow);
+    stroke-width: 18;
+    stroke-linecap: round;
+    opacity: 0; /* Hidden by default, shown by animation */
+    transform-origin: bottom center;
+}
+
+/* Different timings for realistic steam */
+.steam-1 { animation: wiggle-rise 2.5s infinite ease-out; }
+.steam-2 { animation: wiggle-rise 2.5s infinite ease-out 0.8s; }
+.steam-3 { animation: wiggle-rise 2.5s infinite ease-out 1.6s; }
+
+
+/* --- Keyframes for Animations --- */
+
+/* The "Happy Jiggle" Dance */
+@keyframes happy-jiggle {
+    0% { transform: rotate(0deg) scale(1) translateY(0); }
+    33% { transform: rotate(-8deg) scale(1.1) translateY(-5px); }
+    66% { transform: rotate(8deg) scale(1.1) translateY(-5px); }
+    100% { transform: rotate(0deg) scale(1) translateY(0); }
+}
+
+/* The Wavy Steam Rise */
+@keyframes wiggle-rise {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) translateX(0) scaleX(1);
+    }
+    40% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+        /* Moves up AND wiggles side to side */
+        transform: translateY(-30px) translateX(10px) scaleX(1.2);
+    }
+}
+        /* --- 4. NEW: HOUSE RULES (VALUES) --- */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 5rem;
+        }
+
+        .value-card {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-blue);
+        }
+
+        .value-icon {
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        /* --- 5. NEW: FUN STATS --- */
+        .stats-container {
+            background: var(--primary-blue);
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+            color: white;
+            margin-bottom: 5rem;
+            text-align: center;
+        }
+
+        .stat-item h3 { font-size: 2.5rem; margin: 0; color: var(--primary-text); }
+        .stat-item p { margin-top: 5px; font-weight: bold; opacity: 0.9; }
+
+
+        /* --- 6. TEAM GRID --- */
+        .team-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .team-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-blue);
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-blue);
+            margin: 0 auto 1rem;
+            padding: 4px;
+            background: var(--bg-light);
+        }
+
+        .member-name {
+            font-size: 1.4rem;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+
+        .member-role {
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            border: 1px solid var(--border-color);
+        }
+
+        .social-links a:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .about-grid { grid-template-columns: 1fr; }
+            .stats-container { flex-direction: column; }
+        }
+    </style> -->
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo1">
+                <img src="images/logo1.png" class="logoimg" alt="Logo">
+            </div>
+            القهوة
+        </div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html" ><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+            <li class="auth-only" style="display: none;"><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+            <li><a href="about.html" class="active"><i class="fa-solid fa-mug-hot"></i>عن القهوة</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        
+        <header class="about-header">
+            <h1>أصل الحكاية</h1>
+            <p style="color: var(--text-grey);">اعرف مين احنا، وليه عملنا "القهوة"، ومين الشلة اللي سهرت عشان تطلع الموقع ده.</p>
+        </header>
+
+        <section class="about-grid">
+            <div class="about-text">
+                <h2>ليه عملنا "القهوة"؟</h2>
+                <p>فكرة "القهوة" جت من احتياجنا لمكان بسيط، بعيد عن دوشة السوشيال ميديا. مكان شبه قعدة القهوة البلدي بتاعة زمان.</p>
+                <p>هدفنا نخلق مساحة آمنة ليك ولصحابك، تفضفضوا وتلعبوا من غير فلاتر ومن غير سياسة.</p>
+            </div>
+            <div class="about-img-container">
+                <img src="images/coffee-bg.jpg" alt="About Al-Qahwa">
+            </div>
+        </section>
+
+<section class="brand-section">
+    
+    <svg class="brand-logo-large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        
+        <g class="steam-group">
+            <path class="steam-path steam-1" d="M180 130 C 180 100, 160 80, 180 50"/>
+            <path class="steam-path steam-2" d="M256 130 C 256 100, 236 80, 256 50"/>
+            <path class="steam-path steam-3" d="M332 130 C 332 100, 312 80, 332 50"/>
+        </g>
+
+        <g class="cup-body">
+            <path d="M96,176 L96,288 C96,349.9 146.1,400 208,400 L304,400 C365.9,400 416,349.9 416,288 L416,176 L96,176 Z M384,288 C384,332.1 348.1,368 304,368 L208,368 C163.9,368 128,332.1 128,288 L128,208 L384,208 L384,288 Z"/>
+            <path d="M416,208 L432,208 C458.5,208 480,229.5 480,256 C480,282.5 458.5,304 432,304 L416,304 L416,208 Z M416,176 L416,336 L432,336 C476.1,336 512,300.1 512,256 C512,211.9 476.1,176 432,176 L416,176 Z"/>
+        </g>
+    </svg>
+    
+    <h2 style="color: var(--primary-blue); margin-bottom: 0.5rem; font-weight: 800;">هويتنا بسيطة</h2>
+    <p style="color: var(--text-grey); max-width: 600px; margin: 0 auto; font-size: 1.1rem;">
+        شعارنا مش مجرد كوباية.. ده رمز للروقان ولمة الصحاب.
+        <br>
+        <span style="font-size: 0.9rem; opacity: 0.8;">(حرك الماوس او دوس عليها عشان تفوق)</span>
+    </p>
+</section>
+
+        <section class="stats-container">
+            <div class="stat-item">
+                <h3>+500</h3>
+                <p>كوباية شاي</p>
+            </div>
+            <div class="stat-item">
+                <h3>+1000</h3>
+                <p>سطر كود</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>سهرانين عشانك</p>
+            </div>
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>حب ومزاج</p>
+            </div>
+        </section>
+
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="color: var(--primary-blue);">دستور القهوة</h2>
+            <p style="color: var(--text-grey);">قواعدنا بسيطة عشان القعدة تحلو</p>
+        </div>
+        
+        <section class="values-grid">
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-heart"></i></div>
+                <h3>الاحترام أساس</h3>
+                <p style="color: var(--text-grey);">كلنا هنا اخوات، مفيش مكان للتنمر أو قلة الذوق.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-ban"></i></div>
+                <h3>بلاش سياسة</h3>
+                <p style="color: var(--text-grey);">سيب هموم الدنيا برة.. هنا مكان للروقان بس.</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="fa-solid fa-face-smile-wink"></i></div>
+                <h3>الضحكة واجب</h3>
+                <p style="color: var(--text-grey);">الهدف الأول والأخير اننا نتبسط ونخرج من المود.</p>
+            </div>
+        </section>
+
+        <section class="team-section">
+            <h2 style="color: var(--primary-blue); margin-bottom: 0.5rem;">صنايعية القهوة (Team)</h2>
+            <p style="color: var(--text-grey);">الرجالة اللي وقفت ورا الكود</p>
+
+            <div class="team-grid">
+                <div class="team-card">
+                    <img src="images/mms.jpg" alt="Member" class="member-avatar">
+                    <h3 class="member-name">MMS</h3>
+                    <span class="member-role">Founder & Developer</span>
+                    <p class="member-desc">
+                        المايسترو اللي كتب الكود وبنى الأساس القهوة بمزاج عالي.
+                    </p>
+                    <!-- <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-github"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    </div> -->
+                </div>
+
+                <div class="team-card">
+                    <img src="images/mo.jpg" alt="Member" class="member-avatar">
+                    <h3 class="member-name">MO</h3>
+                    <span class="member-role">Designer & Co-Founder</span>
+                    <p class="member-desc">
+                        الفنان اللي ظبط الألوان والديكور، وصاحب الأفكار المجنونة.
+                    </p>
+                    <!-- <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-github"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    </div> -->
+                </div>
+
+                <div class="team-card">
+                    <img src="images/al.jpeg" alt="Member" class="member-avatar">
+                    <h3 class="member-name">Azrael</h3>
+                    <span class="member-role">Tester & Programmer</span>
+                    <p class="member-desc">
+                  المعلم اللي بيجرب القهوة، و يزبطها.
+                    </p>
+                    <!-- <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-github"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    </div> -->
+                </div>
+
+                <!-- <div class="team-card">
+                    <img src="images/tom.webp" alt="Member" class="member-avatar">
+                    <h3 class="member-name">Tom</h3>
+                    <span class="member-role">Gamer & Programmer</span>
+                    <p class="member-desc">
+
+                    </p>
+
+                </div> -->
+                <!-- <div class="team-card">
+                    <img src="images/mario.jpg" alt="Member" class="member-avatar">
+                    <h3 class="member-name">Mario</h3>
+                    <span class="member-role">Mobile-Dev & Programmer</span>
+                    <p class="member-desc">
+
+                    </p>
+
+                </div> -->
+                <!-- <div class="team-card">
+                    <img src="images/Gemini.png" alt="Member" class="member-avatar" style="background-color: white;">
+                    <h3 class="member-name">Gemini</h3>
+                    <span class="member-role">Ai & Helper</span>
+                    <p class="member-desc">
+
+                    </p>
+
+                </div> -->
+                <!-- <div class="team-card">
+                    <img src="images/virusx.png" alt="Member" class="member-avatar">
+                    <h3 class="member-name">Virus X</h3>
+                    <span class="member-role">Programmer & Gamer</span>
+                    <p class="member-desc">
+
+                    </p>
+
+                </div> -->
+            </div>
+            
+        </section>
+
+    </div>
+
+    <footer class="landing-footer">
+        <p>جميع الحقوق محفوظة &copy; 2025 القهوة</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">معمول بحب ☕ ومزاج عالي</p>
+
+    </footer>
+
+    <style>
+        @keyframes rise {
+            0% { opacity: 0; transform: translateY(0) scaleX(1); }
+            50% { opacity: 0.8; transform: translateY(-10px) scaleX(1.2); }
+            100% { opacity: 0; transform: translateY(-20px) scaleX(1); }
+        }
+    </style>
+
+    <script type="module" src="profile-load.js"></script>
+    <script src="script.js"></script>
+    <script src="theme.js"></script>
+
+    <script type="module" src="notifications.js"></script>
+    <script>
+        const coffeeLogo = document.querySelector('.brand-logo-large');
+        
+        if (coffeeLogo) {
+            coffeeLogo.addEventListener('click', function() {
+                // 1. Add class to start animation
+                this.classList.add('tap-active');
+                
+                // 2. Remove class after 2 seconds so it stops (and you can tap again)
+                setTimeout(() => {
+                    this.classList.remove('tap-active');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

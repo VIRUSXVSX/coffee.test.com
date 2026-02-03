@@ -21,8 +21,13 @@
     </nav>
 
     <div class="container">
-        <div class="profile-layout">
+               <div class="profile-layout">
             <aside class="profile-sidebar">
+                <div class="profile-image-container">
+                    <img id="myAvatar" src="images/user.png" class="profile-img-lg">
+                </div>
+                                <h2 id="myName">...</h2>
+                                <br>
                 <ul class="profile-menu" style="margin-top:0;">
                     <li onclick="window.location.href='friends.html'"><i class="fa-solid fa-user-group"></i> الشلة (الأصدقاء)</li>
                     <li onclick="window.location.href='friends-requests.html'"><i class="fa-solid fa-user-plus"></i> طلبات الصداقة</li>
@@ -40,6 +45,7 @@
             </main>
         </div>
     </div>
+    <script type="module" src="user-loader.js"></script>
 <script type="module">
         import { auth, onAuthStateChanged, getNotifications, markNotificationRead } from './auth-service.js';
 
@@ -95,6 +101,12 @@
                 } else if (n.type === 'request_accepted') {
                     icon = 'fa-check-circle';
                 }
+                // ضيف الحالة دي في الـ conditions
+else if (n.type === 'tv_invite') {
+    icon = 'fa-tv';
+    // n.link ده اللي بعتناه في createNotification
+    action = `<button class="btn-primary" onclick="window.location.href='${n.link}'" style="font-size:0.8rem; padding: 5px 10px;">ادخل اتفرج</button>`;
+}
 
                 // Format timestamp safely
                 let timeStr = 'دلوقتي';
@@ -105,7 +117,7 @@
                 }
 
                 return `
-                    <div class="uni-card" style="display:flex; gap:15px; align-items:center; padding:1.2rem; border-right: 4px solid ${n.read ? 'transparent' : 'var(--primary-blue)'}; background: ${bgColor}; margin-bottom: 10px; border-radius: 8px;">
+                    <div class="uni-card" style="display:flex; gap:15px; align-items:center; padding:1.2rem; border-right: 4px solid ${n.read ? 'transparent' : 'var(--primary-blue)'}; background: ${bgColor}; margin-bottom: 10px; border-radius: var(--radius);">
                         <div style="font-size:1.4rem; color:var(--primary-blue);"><i class="fa-solid ${icon}"></i></div>
                         <div style="flex:1;">
                             <p style="margin-bottom:4px; font-weight: ${n.read ? 'normal' : 'bold'};">${content}</p>
@@ -178,7 +190,7 @@
         }
     </script> -->
         <script type="module" src="profile-load.js"></script>
-
+<script type="module" src="user-load.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

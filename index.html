@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
+          <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet"/>
+              <script src="script.js"></script>
+    <script type="module" src="profile-load.js"></script>
+    <script type="module" src="notifications.js"></script>
+
 </head>
 <body>
     <nav class="navbar">
@@ -19,12 +24,76 @@
         <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
       <ul class="nav-links">
     <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
-    <li><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
-</ul>
-        <!-- Navbar Auth Section (Login/Signup or Profile) -->
-        <div class="nav-right" id="navAuth"></div>
-    </nav>
+    <li class="auth-only" style="display: none;"><a href="dashboard.html"><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+        <li><a href="about.html" class=""><i class="fa-solid fa-mug-hot"></i>عن القهوة</a></li>
 
+</ul>
+        <div class="nav-right" id="navAuth"></div>
+
+
+    </nav>
+<!-- <nav class="glass-nav">
+    <div class="nav-container">
+        <a href="index.html" class="nav-brand">
+            <img src="images/logo1.png" alt="Logo" class="brand-logo">
+            <span class="brand-text">القهوة</span>
+        </a>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="index.html" class="nav-link active">
+                    <i class="ri-home-4-fill"></i>
+                    <span class="link-text">الرئيسية</span>
+                </a>
+            </li>
+            <li class="nav-item auth-only" style="display: none;">
+                <a href="index.html" class="nav-link ">
+                    <i class="fa-solid fa-mug-hot"></i>
+                    <span class="link-text"> الصالة</span>
+                </a>
+            </li>
+            <li class="nav-item" >
+                <a href="about.html" class="nav-link ">
+                    <i class="ri-information-line"></i>
+                        <span class="link-text">عن القهوة</span>
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="nav-actions">
+            
+            <div class="notification-wrapper ">
+                <button class="nav-icon-btn auth-only" style="display: none;" id="notifToggleBtn" > 
+                    <i class="ri-notification-3-line"></i>
+                    <span class="notif-badge" id="notifBadge" style="display: none;">0</span>
+                </button>
+
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span>الإشعارات</span>
+                    </div>
+                    
+                    <div class="notif-list-mini" id="notifListMini">
+                        <div style="padding: 20px; text-align: center; color: var(--text-grey);">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                        </div>
+                    </div>
+
+                    <a href="notifications.html" class="notif-footer-link">
+                        عرض كل الإشعارات <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div id="navAuth" class="auth-box"></div>
+
+            <button class="mobile-toggle-btn">
+                <i class="ri-menu-4-line"></i>
+            </button>
+        </div>
+    </div>
+</nav> -->
     <!-- Hero Section -->
     <section id="landing-hero">
         <h1 style="font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">أهلا بيك في القهوة</h1>
@@ -72,7 +141,6 @@
         <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">معمول بحب ☕ ومزاج عالي</p>
     </footer>
 
-    <script src="script.js"></script>
-    <script type="module" src="profile-load.js"></script>
+<script src="theme.js"></script>
 </body>
 </html>
