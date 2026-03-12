@@ -540,7 +540,7 @@
                 else { 
                     npcSayed.state = 'returning'; 
                     me.hasDrink = true; 
-                    me.drinkTimeout = Date.now() + 180000; 
+                    me.drinkTimeout = Date.now() + 10000; 
                     updateServerPosition(); 
                 }
             } else if (npcSayed.state === 'returning') {
@@ -675,4 +675,5 @@
 
     </script>
 </body>
+
 </html>
