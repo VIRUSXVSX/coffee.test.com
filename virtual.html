@@ -258,7 +258,6 @@
                 let ty = Math.floor(seededRandom(i * 21) * (WORLD_SIZE - 200)) + 100;
                 if (Math.abs(tx - CENTER_X) > 280 || Math.abs(ty - CENTER_Y) > 280) mapObjects.push({ type: 'table', x: tx, y: ty, id: i, isHighlighted: false });
             }
-            // إضافة شيشة لبعض الترابيزات عشان تطلع دخان
             for (let i = 0; i < 15; i++) {
                 let tx = Math.floor(seededRandom(i * 50) * (WORLD_SIZE - 200)) + 100;
                 let ty = Math.floor(seededRandom(i * 51) * (WORLD_SIZE - 200)) + 100;
@@ -280,9 +279,6 @@
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-        // ----------------------------------------------------
-        // نقطة التحقق من الـ Role من Firestore أول ما اليوزر يدخل
-        // ----------------------------------------------------
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user; me.id = user.uid;
@@ -351,7 +347,6 @@
             me.x = Math.max(30, Math.min(WORLD_SIZE - 30, me.x));
             me.y = Math.max(30, Math.min(WORLD_SIZE - 30, me.y));
 
-            // أثر خطوات وإنت بتجري
             if (moved && frameCount % 6 === 0) {
                 dustTrails.push({ x: me.x, y: me.y + 20, alpha: 0.5, size: 8 });
             }
@@ -368,10 +363,40 @@
         sendChatBtn.addEventListener('click', sendChat);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
 
+        // =================================================================
+        // FIX: إصلاح مشكلة اختفاء صور جوجل درايف في الكانفاس (CORS Block)
+        // =================================================================
         const imageCache = {};
         function getAvatarImg(url) {
-            if (imageCache[url]) return imageCache[url];
-            const img = new Image(); img.crossOrigin = "anonymous"; img.src = url || 'images/user.png'; imageCache[url] = img; return img;
+            if (!url) url = 'images/user.png';
+
+            let finalUrl = url;
+            if (finalUrl.includes('drive.google.com')) {
+                // تكبير الحجم لـ 200 عشان الجودة تكون أعلى
+                if (finalUrl.includes('sz=')) {
+                    finalUrl = finalUrl.replace(/sz=w\d+/g, 'sz=w200'); 
+                } else if (finalUrl.includes('thumbnail?id=')) {
+                    finalUrl += '&sz=w200';
+                }
+            }
+
+            if (imageCache[finalUrl]) return imageCache[finalUrl];
+
+            const img = new Image(); 
+            
+            // تم إزالة img.crossOrigin = "anonymous"; بالكامل لأنها كانت بتمنع رسم الصورة بسبب الـ CORS من جوجل
+            
+            img.decoding = "async"; 
+
+            img.onerror = function() {
+                if (!this.src.includes('user.png')) {
+                    this.src = 'images/user.png';
+                }
+            };
+
+            img.src = finalUrl; 
+            imageCache[finalUrl] = img; 
+            return img;
         }
 
         // --- الرسم ---
@@ -385,7 +410,6 @@
                     ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 }
             }
-            // الساحة
             ctx.fillStyle = 'rgba(111, 78, 55, 0.1)'; ctx.fillRect(CENTER_X - 350, CENTER_Y - 250, 700, 600);
             ctx.strokeStyle = 'rgba(193, 154, 107, 0.5)'; ctx.lineWidth = 4; ctx.setLineDash([15, 15]); ctx.strokeRect(CENTER_X - 350, CENTER_Y - 250, 700, 600); ctx.setLineDash([]); 
             ctx.fillStyle = 'rgba(193, 154, 107, 0.8)'; ctx.font = "bold 28px 'Segoe UI'"; ctx.textAlign = "center"; ctx.fillText("الساحة الرئيسية", CENTER_X, CENTER_Y + 320);
@@ -455,35 +479,29 @@
             const avatarRadius = 24; const img = getAvatarImg(player.photoURL);
             ctx.save(); ctx.translate(player.x, player.y); if (player.isFlipped) ctx.scale(-1, 1);
             ctx.beginPath(); ctx.arc(0, 0, avatarRadius, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
-            if (img.complete) { ctx.drawImage(img, -avatarRadius, -avatarRadius, avatarRadius * 2, avatarRadius * 2); } else { ctx.fillStyle = '#ccc'; ctx.fill(); }
+            if (img.complete && img.naturalWidth > 0) { 
+                ctx.drawImage(img, -avatarRadius, -avatarRadius, avatarRadius * 2, avatarRadius * 2); 
+            } else { 
+                ctx.fillStyle = '#ccc'; ctx.fill(); 
+            }
             ctx.restore();
 
             ctx.beginPath(); ctx.arc(player.x, player.y, avatarRadius, 0, Math.PI * 2);
             ctx.lineWidth = isMe ? 4 : 3; ctx.strokeStyle = player.isVIP ? '#FFD700' : (isMe ? '#C19A6B' : '#4A3424'); ctx.stroke();
 
-            // ==========================================
-            // FIX: Solid Coffee Cup Background
-            // ==========================================
             if (player.hasDrink && Date.now() < player.drinkTimeout) {
-                // رسم خلفية بيضاء صلبة عشان الإيموجي ميبقاش شفاف
                 ctx.fillStyle = '#FFFFFF';
                 ctx.beginPath(); 
                 ctx.arc(player.x + 25, player.y - 25, 14, 0, Math.PI * 2); 
                 ctx.fill();
-                
-                // إطار خارجي للكوباية
                 ctx.lineWidth = 2; 
                 ctx.strokeStyle = '#C19A6B'; 
                 ctx.stroke();
-
-                // رسم الإيموجي بوضوح
                 ctx.fillStyle = '#000000';
                 ctx.font = "16px Arial"; 
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.fillText("☕", player.x + 25, player.y - 23);
-                
-                // إرجاع الضبط الطبيعي للنصوص اللي تحت
                 ctx.textBaseline = "alphabetic";
             }
 
@@ -522,7 +540,7 @@
                 else { 
                     npcSayed.state = 'returning'; 
                     me.hasDrink = true; 
-                    me.drinkTimeout = Date.now() + 10000; 
+                    me.drinkTimeout = Date.now() + 180000; 
                     updateServerPosition(); 
                 }
             } else if (npcSayed.state === 'returning') {
@@ -600,7 +618,6 @@
             if(distToCenter < 400) { coordsDisplay.innerText = "الساحة الرئيسية 📍"; coordsDisplay.style.color = "#C19A6B"; } 
             else { coordsDisplay.innerText = `تائه في القهوة 🚶 (X:${Math.floor(me.x)}, Y:${Math.floor(me.y)})`; coordsDisplay.style.color = "#fff"; }
 
-            // تحديد الترابيزة القريبة 
             mapObjects.forEach(obj => { 
                 if (obj.type === 'table') obj.isHighlighted = false; 
             });
@@ -635,13 +652,10 @@
                 }
             });
 
-            // ----------------------------------------------------
-            // حل مشكلة العمق (Y-Sorting Fix) - الترابيزة دايماً تحت
-            // ----------------------------------------------------
             renderList.forEach(item => {
-                item.sortY = item.y; // الافتراضي
+                item.sortY = item.y; 
                 if (!item.isPlayer && item.type === 'table') {
-                    item.sortY -= 200; // ده بيجبر الترابيزات تترسم الأول كخلفية، فاللاعب دايماً هيمشي "فوقها"
+                    item.sortY -= 200; 
                 }
             });
 
@@ -661,5 +675,4 @@
 
     </script>
 </body>
-
 </html>
