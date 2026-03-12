@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2C1810">
+    <title>القهوة - العالم المفتوح (VIP)</title>
+    
+    <script src="https://js.puter.com/v2/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.8.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+    <script type="module" src="profile-load.js"></script>
+    <script src="script.js"></script>
+
+    <style>
+        body {
+            overflow: hidden; margin: 0; padding: 0; background-color: #2C1810;
+            touch-action: none; user-select: none; -webkit-user-select: none;
+        }
+
+        #gameContainer {
+            position: relative; width: 100vw; height: 100vh; background: #2C1810; overflow: hidden;
+        }
+
+        canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+
+        /* --- واجهة المستخدم العلوية --- */
+        .floating-settings-btn {
+            position: absolute; top: 20px; right: 20px; background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 2px solid var(--border-color); color: var(--primary-blue);
+            width: 45px; height: 45px; border-radius: 50%; font-size: 1.4rem;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            z-index: 150; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;
+        }
+        .floating-settings-btn:hover { transform: scale(1.1) rotate(90deg); }
+
+        #coordsDisplay {
+            position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px); color: var(--accent-yellow); padding: 8px 15px;
+            border-radius: 12px; font-family: monospace; font-size: 14px; font-weight: bold;
+            z-index: 10; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* --- قائمة الإعدادات --- */
+        .settings-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 200;
+            display: none; justify-content: center; align-items: center; opacity: 0; transition: 0.3s ease;
+        }
+        .settings-overlay.active { display: flex; opacity: 1; }
+        .settings-modal {
+            background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 20px;
+            width: 90%; max-width: 320px; padding: 25px; text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4); transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .settings-overlay.active .settings-modal { transform: scale(1); }
+        .settings-modal h3 { color: var(--primary-blue); margin-bottom: 20px; }
+        .settings-btn {
+            width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px;
+            border: 1px solid var(--border-color); background: var(--bg-light); color: var(--text-dark);
+            font-size: 1rem; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            gap: 10px; cursor: pointer; transition: 0.2s;
+        }
+        .settings-btn:hover { background: rgba(111, 78, 55, 0.1); color: var(--primary-blue); }
+        .settings-btn.primary { background: var(--primary-blue); color: white; border: none; }
+
+        /* --- شريط الشات والطلبات والإيموجي --- */
+        .game-chat-overlay {
+            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px); padding: 8px 12px; border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 100; width: 95%; max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .game-chat-overlay input { flex: 1; border: none; background: transparent; font-family: inherit; font-size: 1rem; font-weight: 600; outline: none; }
+        .chat-action-btn {
+            background: var(--bg-light); color: var(--primary-blue); border: 2px solid var(--border-color);
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: 0.2s;
+        }
+        .chat-action-btn:hover { background: var(--border-color); color: white; }
+        .game-chat-overlay .chat-btn {
+            background: var(--primary-blue); color: white; border: none; width: 45px; height: 45px;
+            border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: 0.3s;
+        }
+
+        /* قائمة الإيموجي */
+        .emote-menu {
+            position: absolute; bottom: 80px; right: 50px; background: rgba(255,255,255,0.9);
+            border-radius: 15px; padding: 10px; display: none; gap: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color); z-index: 101;
+        }
+        .emote-menu span { font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .emote-menu span:hover { transform: scale(1.3); }
+
+        /* --- أزرار الموبايل --- */
+        .mobile-controls {
+            position: absolute; bottom: 100px; right: 560px; display: grid;
+            grid-template-columns: 55px 55px 55px; grid-template-rows: 55px 55px 55px; gap: 8px; z-index: 10;
+        }
+        .d-btn {
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(8px); border: 1px solid rgba(111, 78, 55, 0.3);
+            border-radius: 18px; color: var(--primary-blue); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; user-select: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: 0.1s;
+        }
+        .d-btn:active { background: var(--primary-blue); color: white; transform: scale(0.92); }
+        #btn-up { grid-column: 2; grid-row: 1; } #btn-left { grid-column: 1; grid-row: 2; } #btn-right { grid-column: 3; grid-row: 2; } #btn-down { grid-column: 2; grid-row: 3; }
+
+        @media (min-width: 900px) { .mobile-controls { display: none; } }
+        @media (max-width: 768px) {
+            .game-chat-overlay { bottom: 15px; padding: 6px 10px; }
+            .chat-action-btn { width: 35px; height: 35px; }
+            .game-chat-overlay .chat-btn { width: 40px; height: 40px; }
+            .mobile-controls { bottom: 80px; right: 650px; grid-template-columns: 50px 50px 50px; grid-template-rows: 50px 50px 50px; }
+            #myMiniAvatar { width: 35px !important; height: 35px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="cafeAudio" loop>
+        <!-- <source src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3" type="audio/mpeg"> -->
+    </audio>
+
+    <div id="gameContainer">
+        <div id="coordsDisplay">المركز الرئيسي</div>
+        <button id="settingsToggleBtn" class="floating-settings-btn"><i class="fa-solid fa-gear"></i></button>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="mobile-controls">
+            <div class="d-btn" id="btn-up"><i class="fa-solid fa-caret-up"></i></div>
+            <div class="d-btn" id="btn-left"><i class="fa-solid fa-caret-left"></i></div>
+            <div class="d-btn" id="btn-right"><i class="fa-solid fa-caret-right"></i></div>
+            <div class="d-btn" id="btn-down"><i class="fa-solid fa-caret-down"></i></div>
+        </div>
+
+        <div class="game-chat-overlay">
+            <img id="myMiniAvatar" src="images/user.png" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-yellow);">
+            <button class="chat-action-btn" id="orderTeaBtn" title="اطلب قهوة"><i class="fa-solid fa-mug-hot"></i></button>
+            <button class="chat-action-btn" id="emoteToggleBtn" title="ريأكت"><i class="fa-solid fa-face-laugh-beam"></i></button>
+            <input type="text" id="chatInput" placeholder="دردش مع الناس..." autocomplete="off" maxlength="60">
+            <button class="chat-btn" id="sendChatBtn"><i class="fa-solid fa-comment-dots"></i></button>
+        </div>
+
+        <div id="emoteMenu" class="emote-menu">
+            <span class="emote-item">❤️</span>
+            <span class="emote-item">😎</span>
+            <span class="emote-item">😂</span>
+            <span class="emote-item">😡</span>
+            <span class="emote-item">👍</span>
+        </div>
+
+        <div id="settingsOverlay" class="settings-overlay">
+            <div class="settings-modal">
+                <h3><i class="fa-solid fa-sliders"></i> القائمة</h3>
+                <button class="settings-btn" id="fullscreenBtn"><i class="fa-solid fa-expand"></i> شاشة كاملة (للموبايل)</button>
+                <button class="settings-btn" id="toggleVipBtn" style="display: none;"><i class="fa-solid fa-crown"></i> تفعيل نظام الـ VIP</button>
+                <button class="settings-btn" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-door-open"></i> العودة للصالة</button>
+                <button class="settings-btn primary" id="closeSettingsBtn" style="margin-top: 15px;"><i class="fa-solid fa-check"></i> كمل لعب</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, onAuthStateChanged, rtdb, ref, set, onValue, onDisconnect, getUserData } from './auth-service.js';
+
+        // الواجهة
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        document.getElementById('settingsToggleBtn').addEventListener('click', () => settingsOverlay.classList.add('active'));
+        document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsOverlay.classList.remove('active'));
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } 
+            else { if (document.exitFullscreen) document.exitFullscreen(); }
+        });
+
+        const cafeAudio = document.getElementById('cafeAudio');
+        document.body.addEventListener('click', () => {
+            if (cafeAudio.paused) { cafeAudio.volume = 0; cafeAudio.play().catch(()=>{}); }
+        }, { once: true });
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const chatInput = document.getElementById('chatInput');
+        const sendChatBtn = document.getElementById('sendChatBtn');
+        const myMiniAvatar = document.getElementById('myMiniAvatar');
+        const coordsDisplay = document.getElementById('coordsDisplay');
+
+        // إعدادات العالم
+        const WORLD_SIZE = 5000; 
+        const TILE_SIZE = 50;
+        const CENTER_X = WORLD_SIZE / 2;
+        const CENTER_Y = WORLD_SIZE / 2;
+        let camera = { x: 0, y: 0 };
+
+        let currentUser = null;
+        let myPlayerRef = null;
+        let players = {}; 
+        
+        let me = {
+            id: null, name: "زبون", photoURL: "images/user.png",
+            x: CENTER_X, y: CENTER_Y + 120, 
+            message: "", msgTimeout: 0, 
+            emote: "", emoteTimeout: 0,
+            hasDrink: false, drinkTimeout: 0,
+            isVIP: false, isFlipped: false
+        };
+
+        // --- نظام الـ VIP ---
+        document.getElementById('toggleVipBtn').addEventListener('click', function() {
+            me.isVIP = !me.isVIP;
+            this.innerHTML = me.isVIP ? '<i class="fa-solid fa-crown" style="color:gold;"></i> إلغاء الـ VIP' : '<i class="fa-solid fa-crown"></i> تفعيل نظام الـ VIP';
+            updateServerPosition();
+            settingsOverlay.classList.remove('active');
+        });
+
+        // --- سيد كباية (NPC القهوجي) ---
+        let npcSayed = { active: false, x: CENTER_X - 100, y: CENTER_Y - 50, targetX: 0, targetY: 0, state: 'idle' };
+
+        document.getElementById('orderTeaBtn').addEventListener('click', () => {
+            npcSayed.active = true;
+            npcSayed.x = CENTER_X - 150; npcSayed.y = CENTER_Y - 50; 
+            npcSayed.targetX = me.x; npcSayed.targetY = me.y;
+            npcSayed.state = 'delivering';
+            me.message = "واحد شاي مظبوط يا سيد!"; me.msgTimeout = Date.now() + 4000;
+            updateServerPosition();
+        });
+
+        // --- نظام الإيموجي ---
+        const emoteMenu = document.getElementById('emoteMenu');
+        document.getElementById('emoteToggleBtn').addEventListener('click', () => {
+            emoteMenu.style.display = emoteMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+        document.querySelectorAll('.emote-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                me.emote = e.target.innerText;
+                me.emoteTimeout = Date.now() + 3000; 
+                updateServerPosition();
+                emoteMenu.style.display = 'none';
+            });
+        });
+
+        // ==========================================
+        // أنظمة الجرافيكس المتقدمة (دخان وأثر خطوات)
+        // ==========================================
+        let smokeParticles = []; // دخان الشيشة
+        let dustTrails = [];     // آثار الخطوات
+
+        // التوليد التلقائي (البيئة)
+        const mapObjects = [];
+        function seededRandom(seed) { let x = Math.sin(seed++) * 10000; return x - Math.floor(x); }
+
+        function generateWorld() {
+            mapObjects.push({ type: 'main_bar', x: CENTER_X - 150, y: CENTER_Y - 80, w: 300, h: 90 });
+            for (let i = 0; i < 50; i++) {
+                let tx = Math.floor(seededRandom(i * 20) * (WORLD_SIZE - 200)) + 100;
+                let ty = Math.floor(seededRandom(i * 21) * (WORLD_SIZE - 200)) + 100;
+                if (Math.abs(tx - CENTER_X) > 280 || Math.abs(ty - CENTER_Y) > 280) mapObjects.push({ type: 'table', x: tx, y: ty, id: i, isHighlighted: false });
+            }
+            // إضافة شيشة لبعض الترابيزات عشان تطلع دخان
+            for (let i = 0; i < 15; i++) {
+                let tx = Math.floor(seededRandom(i * 50) * (WORLD_SIZE - 200)) + 100;
+                let ty = Math.floor(seededRandom(i * 51) * (WORLD_SIZE - 200)) + 100;
+                if (Math.abs(tx - CENTER_X) > 300 || Math.abs(ty - CENTER_Y) > 300) mapObjects.push({ type: 'shisha', x: tx, y: ty });
+            }
+            for (let i = 0; i < 10; i++) {
+                let tx = Math.floor(seededRandom(i * 30) * (WORLD_SIZE - 200)) + 100;
+                let ty = Math.floor(seededRandom(i * 31) * (WORLD_SIZE - 200)) + 100;
+                if (Math.abs(tx - CENTER_X) > 300 || Math.abs(ty - CENTER_Y) > 300) mapObjects.push({ type: 'tv', x: tx, y: ty });
+            }
+            for (let i = 0; i < 50; i++) {
+                let tx = Math.floor(seededRandom(i * 40) * (WORLD_SIZE - 100)) + 50;
+                let ty = Math.floor(seededRandom(i * 41) * (WORLD_SIZE - 100)) + 50;
+                if (Math.abs(tx - CENTER_X) > 200 || Math.abs(ty - CENTER_Y) > 200) mapObjects.push({ type: 'plant', x: tx, y: ty });
+            }
+        }
+        generateWorld(); 
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        // ----------------------------------------------------
+        // نقطة التحقق من الـ Role من Firestore أول ما اليوزر يدخل
+        // ----------------------------------------------------
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user; me.id = user.uid;
+                me.name = user.displayName ? user.displayName.split(' ')[0] : "زبون";
+                me.photoURL = user.photoURL || "images/user.png";
+                myMiniAvatar.src = me.photoURL;
+
+                try {
+                    const userData = await getUserData(user.uid);
+                    const role = userData?.role || (userData?.data && userData.data.role);
+                    
+                    if (role === 'المعلم' || role === 'المعلمة') {
+                        document.getElementById('toggleVipBtn').style.display = 'flex';
+                    }
+                } catch (error) {
+                    console.error("Error fetching user role:", error);
+                }
+
+                myPlayerRef = ref(rtdb, `tv_rooms/virtual_cafe_players/${user.uid}`);
+                onDisconnect(myPlayerRef).remove(); 
+                
+                updateServerPosition(); 
+                listenToPlayers(); 
+                requestAnimationFrame(gameLoop);
+            } else { 
+                window.location.href = 'index.html'; 
+            }
+        });
+
+        let lastUpdate = 0;
+        function updateServerPosition() {
+            if (!myPlayerRef) return;
+            const now = Date.now();
+            if (now - lastUpdate > 60) { 
+                set(myPlayerRef, me);
+                lastUpdate = now;
+            }
+        }
+
+        function listenToPlayers() {
+            onValue(ref(rtdb, 'tv_rooms/virtual_cafe_players'), (snapshot) => { players = snapshot.val() || {}; });
+        }
+
+        const speed = 5;
+        const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+
+        window.addEventListener('keydown', (e) => { if(document.activeElement !== chatInput) keys[e.key] = true; });
+        window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+        const setupMobileBtn = (id, keyName) => {
+            const btn = document.getElementById(id);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+        };
+        setupMobileBtn('btn-up', 'ArrowUp'); setupMobileBtn('btn-down', 'ArrowDown'); setupMobileBtn('btn-left', 'ArrowRight'); setupMobileBtn('btn-right', 'ArrowLeft');
+
+        let frameCount = 0; 
+        function movePlayer() {
+            let moved = false;
+            if (document.querySelector('.settings-overlay.active')) return;
+
+            if (keys.w || keys.ArrowUp) { me.y -= speed; moved = true; }
+            if (keys.s || keys.ArrowDown) { me.y += speed; moved = true; }
+            if (keys.a || keys.ArrowLeft) { me.x -= speed; moved = true; me.isFlipped = true; } 
+            if (keys.d || keys.ArrowRight) { me.x += speed; moved = true; me.isFlipped = false; } 
+
+            me.x = Math.max(30, Math.min(WORLD_SIZE - 30, me.x));
+            me.y = Math.max(30, Math.min(WORLD_SIZE - 30, me.y));
+
+            // أثر خطوات وإنت بتجري
+            if (moved && frameCount % 6 === 0) {
+                dustTrails.push({ x: me.x, y: me.y + 20, alpha: 0.5, size: 8 });
+            }
+
+            if (moved) updateServerPosition();
+        }
+
+        function sendChat() {
+            const text = chatInput.value.trim();
+            if (!text || !myPlayerRef) return;
+            me.message = text; me.msgTimeout = Date.now() + 6000; 
+            updateServerPosition(); chatInput.value = ''; chatInput.blur();
+        }
+        sendChatBtn.addEventListener('click', sendChat);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChat(); });
+
+        const imageCache = {};
+        function getAvatarImg(url) {
+            if (imageCache[url]) return imageCache[url];
+            const img = new Image(); img.crossOrigin = "anonymous"; img.src = url || 'images/user.png'; imageCache[url] = img; return img;
+        }
+
+        // --- الرسم ---
+        function drawMap() {
+            const startCol = Math.floor(camera.x / TILE_SIZE); const endCol = startCol + (canvas.width / TILE_SIZE) + 1;
+            const startRow = Math.floor(camera.y / TILE_SIZE); const endRow = startRow + (canvas.height / TILE_SIZE) + 1;
+
+            for (let r = startRow; r < endRow; r++) {
+                for (let c = startCol; c < endCol; c++) {
+                    ctx.fillStyle = (r + c) % 2 === 0 ? '#F5F5DC' : '#EDE0D4'; 
+                    ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+            }
+            // الساحة
+            ctx.fillStyle = 'rgba(111, 78, 55, 0.1)'; ctx.fillRect(CENTER_X - 350, CENTER_Y - 250, 700, 600);
+            ctx.strokeStyle = 'rgba(193, 154, 107, 0.5)'; ctx.lineWidth = 4; ctx.setLineDash([15, 15]); ctx.strokeRect(CENTER_X - 350, CENTER_Y - 250, 700, 600); ctx.setLineDash([]); 
+            ctx.fillStyle = 'rgba(193, 154, 107, 0.8)'; ctx.font = "bold 28px 'Segoe UI'"; ctx.textAlign = "center"; ctx.fillText("الساحة الرئيسية", CENTER_X, CENTER_Y + 320);
+        }
+
+        function drawObject(obj) {
+            if (obj.type === 'table') {
+                if (obj.isHighlighted) {
+                    ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+                    ctx.shadowBlur = 20;
+                }
+
+                ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(obj.x, obj.y + 10, 50, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = obj.isHighlighted ? '#8B5A2B' : '#6F4E37'; 
+                ctx.beginPath(); ctx.arc(obj.x, obj.y, 50, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = obj.isHighlighted ? '#FFD700' : '#4A3424'; 
+                ctx.lineWidth = obj.isHighlighted ? 4 : 3; ctx.stroke();
+                ctx.shadowBlur = 0; 
+                
+                ctx.fillStyle = '#2C1810'; ctx.fillRect(obj.x - 15, obj.y - 15, 30, 30);
+                ctx.fillStyle = '#D2B48C'; ctx.fillRect(obj.x - 13, obj.y - 13, 12, 26); ctx.fillRect(obj.x + 1, obj.y - 13, 12, 26);
+                ctx.fillStyle = obj.isHighlighted ? '#D2B48C' : '#C19A6B'; 
+                ctx.fillRect(obj.x - 70, obj.y - 15, 20, 30); ctx.fillRect(obj.x + 50, obj.y - 15, 20, 30); ctx.fillRect(obj.x - 15, obj.y - 70, 30, 20); ctx.fillRect(obj.x - 15, obj.y + 50, 30, 20);
+            } 
+            else if (obj.type === 'main_bar') {
+                ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.roundRect(obj.x+5, obj.y+45, obj.w, obj.h, 15); ctx.fill();
+                ctx.fillStyle = '#4A3424'; ctx.beginPath(); ctx.roundRect(obj.x, obj.y, obj.w, obj.h, 15); ctx.fill();
+                ctx.fillStyle = '#D2B48C'; ctx.beginPath(); ctx.roundRect(obj.x, obj.y, obj.w, 35, 15); ctx.fill();
+                ctx.fillStyle = '#7f8c8d'; ctx.fillRect(obj.x + 30, obj.y - 20, 50, 40); ctx.fillStyle = '#bdc3c7'; ctx.fillRect(obj.x + 35, obj.y - 25, 40, 15);
+                // ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(obj.x + 120, obj.y + 15, 6, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(obj.x + 140, obj.y + 15, 6, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#FFF'; ctx.font = "bold 22px 'Segoe UI'"; ctx.textAlign = "center"; ctx.fillText("القهوة الرئيسية ☕", obj.x + obj.w/2, obj.y + 25);
+            }
+            else if (obj.type === 'shisha') {
+                ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(obj.x, obj.y+5, 12, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#2980b9'; ctx.beginPath(); ctx.arc(obj.x, obj.y, 10, 0, Math.PI*2); ctx.fill(); 
+                ctx.fillStyle = '#f1c40f'; ctx.fillRect(obj.x-2, obj.y-25, 4, 25); 
+                ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(obj.x, obj.y-28, 5, 0, Math.PI*2); ctx.fill(); 
+                if(Math.random() < 0.1) smokeParticles.push({ x: obj.x, y: obj.y-30, alpha: 0.8, size: 5, speedY: 0.5 + Math.random(), speedX: (Math.random()-0.5) });
+            }
+            else if (obj.type === 'tv') {
+                ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(obj.x - 30, obj.y + 10, 60, 10); 
+                ctx.fillStyle = '#333'; ctx.fillRect(obj.x - 5, obj.y - 40, 10, 50); 
+                ctx.fillStyle = '#111'; ctx.beginPath(); ctx.roundRect(obj.x - 40, obj.y - 70, 80, 50, 5); ctx.fill(); 
+                let time = Date.now() / 500;
+                ctx.fillStyle = (Math.floor(time) % 2 === 0) ? '#27ae60' : '#2ecc71'; 
+                ctx.beginPath(); ctx.roundRect(obj.x - 35, obj.y - 65, 70, 40, 2); ctx.fill();
+                let ballX = obj.x - 30 + (Math.sin(time * 2) + 1) * 25;
+                ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(ballX, obj.y - 45, 3, 0, Math.PI*2); ctx.fill();
+            }
+            else if (obj.type === 'plant') {
+                ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(obj.x, obj.y + 5, 15, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#e67e22'; ctx.beginPath(); ctx.arc(obj.x, obj.y, 15, 0, Math.PI * 2); ctx.fill(); 
+                ctx.fillStyle = '#2ecc71'; ctx.beginPath(); ctx.arc(obj.x, obj.y - 20, 20, 0, Math.PI * 2); ctx.fill(); 
+                ctx.beginPath(); ctx.arc(obj.x - 10, obj.y - 10, 15, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.arc(obj.x + 10, obj.y - 10, 15, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        function drawAvatar(player, isMe) {
+            if (player.isVIP) {
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+                ctx.beginPath(); ctx.ellipse(player.x, player.y + 20, 35, 15, 0, 0, Math.PI * 2); ctx.fill();
+            } else {
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath(); ctx.ellipse(player.x, player.y + 25, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
+            }
+
+            const avatarRadius = 24; const img = getAvatarImg(player.photoURL);
+            ctx.save(); ctx.translate(player.x, player.y); if (player.isFlipped) ctx.scale(-1, 1);
+            ctx.beginPath(); ctx.arc(0, 0, avatarRadius, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+            if (img.complete) { ctx.drawImage(img, -avatarRadius, -avatarRadius, avatarRadius * 2, avatarRadius * 2); } else { ctx.fillStyle = '#ccc'; ctx.fill(); }
+            ctx.restore();
+
+            ctx.beginPath(); ctx.arc(player.x, player.y, avatarRadius, 0, Math.PI * 2);
+            ctx.lineWidth = isMe ? 4 : 3; ctx.strokeStyle = player.isVIP ? '#FFD700' : (isMe ? '#C19A6B' : '#4A3424'); ctx.stroke();
+
+            // ==========================================
+            // FIX: Solid Coffee Cup Background
+            // ==========================================
+            if (player.hasDrink && Date.now() < player.drinkTimeout) {
+                // رسم خلفية بيضاء صلبة عشان الإيموجي ميبقاش شفاف
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath(); 
+                ctx.arc(player.x + 25, player.y - 25, 14, 0, Math.PI * 2); 
+                ctx.fill();
+                
+                // إطار خارجي للكوباية
+                ctx.lineWidth = 2; 
+                ctx.strokeStyle = '#C19A6B'; 
+                ctx.stroke();
+
+                // رسم الإيموجي بوضوح
+                ctx.fillStyle = '#000000';
+                ctx.font = "16px Arial"; 
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("☕", player.x + 25, player.y - 23);
+                
+                // إرجاع الضبط الطبيعي للنصوص اللي تحت
+                ctx.textBaseline = "alphabetic";
+            }
+
+            ctx.font = player.isVIP ? "bold 14px 'Segoe UI'" : "bold 13px 'Segoe UI'";
+            const nameWidth = ctx.measureText(player.name).width;
+            ctx.fillStyle = player.isVIP ? 'rgba(255, 215, 0, 0.9)' : 'rgba(255, 255, 255, 0.85)';
+            ctx.beginPath(); ctx.roundRect(player.x - nameWidth/2 - 8, player.y + 30, nameWidth + 16, 22, 10); ctx.fill();
+            ctx.fillStyle = '#2C1810'; ctx.textAlign = "center"; 
+            ctx.fillText(player.isVIP ? `👑 ${player.name}` : player.name, player.x, player.y + 45);
+
+            if (player.emote && Date.now() < player.emoteTimeout) {
+                ctx.font = "30px Arial"; let upOffset = (player.emoteTimeout - Date.now()) / 30;
+                ctx.fillText(player.emote, player.x, player.y - 40 - upOffset);
+            }
+
+            if (player.message && Date.now() < player.msgTimeout) {
+                ctx.font = "bold 14px 'Segoe UI'"; const msgWidth = ctx.measureText(player.message).width;
+                const bubbleWidth = Math.min(Math.max(msgWidth + 30, 80), 280);
+                ctx.fillStyle = player.isVIP ? '#FFD700' : (isMe ? '#6F4E37' : '#FFFFFF'); 
+                ctx.beginPath(); ctx.roundRect(player.x - bubbleWidth/2, player.y - 85, bubbleWidth, 36, 18); ctx.fill();
+                ctx.lineWidth = 2; ctx.strokeStyle = player.isVIP ? '#B8860B' : (isMe ? '#C19A6B' : '#6F4E37'); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(player.x - 8, player.y - 49); ctx.lineTo(player.x + 8, player.y - 49); ctx.lineTo(player.x, player.y - 38); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(player.x - 7, player.y - 49); ctx.lineTo(player.x + 7, player.y - 49); ctx.strokeStyle = player.isVIP ? '#FFD700' : (isMe ? '#6F4E37' : '#FFFFFF'); ctx.stroke();
+                ctx.fillStyle = isMe && !player.isVIP ? '#FFFFFF' : '#2C1810'; ctx.textAlign = "center";
+                let displayMsg = player.message; if(msgWidth > 250) displayMsg = displayMsg.substring(0, 30) + "...";
+                ctx.fillText(displayMsg, player.x, player.y - 62);
+            }
+        }
+
+        function drawSayed() {
+            if (!npcSayed.active) return;
+            if (npcSayed.state === 'delivering') {
+                let dx = npcSayed.targetX - npcSayed.x; let dy = npcSayed.targetY - npcSayed.y;
+                let dist = Math.hypot(dx, dy);
+                if (dist > 5) { npcSayed.x += (dx / dist) * 6; npcSayed.y += (dy / dist) * 6; } 
+                else { 
+                    npcSayed.state = 'returning'; 
+                    me.hasDrink = true; 
+                    me.drinkTimeout = Date.now() + 10000; 
+                    updateServerPosition(); 
+                }
+            } else if (npcSayed.state === 'returning') {
+                let dx = (CENTER_X - 150) - npcSayed.x; let dy = (CENTER_Y - 50) - npcSayed.y;
+                let dist = Math.hypot(dx, dy);
+                if (dist > 5) { npcSayed.x += (dx / dist) * 6; npcSayed.y += (dy / dist) * 6; } 
+                else { npcSayed.active = false; }
+            }
+            ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.ellipse(npcSayed.x, npcSayed.y + 25, 15, 6, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(npcSayed.x, npcSayed.y, 20, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#2C1810'; ctx.font = "20px Arial"; ctx.fillText("🤵", npcSayed.x - 10, npcSayed.y + 7);
+            ctx.font = "12px Arial"; ctx.fillText("سيد", npcSayed.x, npcSayed.y + 35);
+        }
+
+        function drawEffects() {
+            for (let i = dustTrails.length - 1; i >= 0; i--) {
+                let d = dustTrails[i];
+                ctx.fillStyle = `rgba(193, 154, 107, ${d.alpha})`;
+                ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, Math.PI*2); ctx.fill();
+                d.alpha -= 0.02; d.size += 0.2;
+                if(d.alpha <= 0) dustTrails.splice(i, 1);
+            }
+        }
+
+        function drawSmokeAndLighting() {
+            for (let i = smokeParticles.length - 1; i >= 0; i--) {
+                let s = smokeParticles[i];
+                ctx.fillStyle = `rgba(200, 200, 200, ${s.alpha})`;
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+                s.y -= s.speedY; s.x += s.speedX; s.alpha -= 0.01; s.size += 0.2;
+                if(s.alpha <= 0) smokeParticles.splice(i, 1);
+            }
+
+            let darkness = 0; 
+            if (darkness > 0.1) {
+                ctx.fillStyle = `rgba(15, 15, 25, ${darkness})`;
+                ctx.fillRect(camera.x, camera.y, canvas.width, canvas.height);
+
+                ctx.globalCompositeOperation = 'destination-out';
+                
+                let mainGlow = ctx.createRadialGradient(CENTER_X, CENTER_Y, 50, CENTER_X, CENTER_Y, 400);
+                mainGlow.addColorStop(0, `rgba(255,255,255, ${darkness})`);
+                mainGlow.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = mainGlow;
+                ctx.beginPath(); ctx.arc(CENTER_X, CENTER_Y, 400, 0, Math.PI*2); ctx.fill();
+
+                mapObjects.forEach(obj => {
+                    if(obj.type === 'tv') {
+                        let tvGlow = ctx.createRadialGradient(obj.x, obj.y, 20, obj.x, obj.y, 150);
+                        tvGlow.addColorStop(0, `rgba(255,255,255, ${darkness})`);
+                        tvGlow.addColorStop(1, 'rgba(255,255,255,0)');
+                        ctx.fillStyle = tvGlow;
+                        ctx.beginPath(); ctx.arc(obj.x, obj.y, 150, 0, Math.PI*2); ctx.fill();
+                    }
+                });
+
+                ctx.globalCompositeOperation = 'source-over'; 
+            }
+        }
+
+        function gameLoop() {
+            frameCount++;
+            movePlayer();
+
+            camera.x = me.x - canvas.width / 2; camera.y = me.y - canvas.height / 2;
+            camera.x = Math.max(0, Math.min(camera.x, WORLD_SIZE - canvas.width));
+            camera.y = Math.max(0, Math.min(camera.y, WORLD_SIZE - canvas.height));
+
+            let distToCenter = Math.hypot(me.x - CENTER_X, me.y - CENTER_Y);
+            if (!cafeAudio.paused) {
+                let vol = Math.max(0, 1 - (distToCenter / 800));
+                cafeAudio.volume = vol;
+            }
+
+            if(distToCenter < 400) { coordsDisplay.innerText = "الساحة الرئيسية 📍"; coordsDisplay.style.color = "#C19A6B"; } 
+            else { coordsDisplay.innerText = `تائه في القهوة 🚶 (X:${Math.floor(me.x)}, Y:${Math.floor(me.y)})`; coordsDisplay.style.color = "#fff"; }
+
+            // تحديد الترابيزة القريبة 
+            mapObjects.forEach(obj => { 
+                if (obj.type === 'table') obj.isHighlighted = false; 
+            });
+
+            mapObjects.forEach(obj => {
+                if (obj.type === 'table' && Math.hypot(me.x - obj.x, me.y - obj.y) < 80) {
+                    obj.isHighlighted = true; 
+                }
+            });
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(-camera.x, -camera.y);
+
+            drawMap();
+            drawEffects(); 
+
+            let renderList = [];
+            mapObjects.forEach(obj => {
+                if (obj.x > camera.x - 300 && obj.x < camera.x + canvas.width + 300 && obj.y > camera.y - 300 && obj.y < camera.y + canvas.height + 300) {
+                    renderList.push(obj);
+                }
+            });
+
+            const allPlayers = Object.values(players);
+            const myIndex = allPlayers.findIndex(p => p.name === me.name);
+            if (myIndex !== -1) allPlayers[myIndex] = me; else allPlayers.push(me);
+
+            allPlayers.forEach(p => {
+                if (p.x > camera.x - 100 && p.x < camera.x + canvas.width + 100 && p.y > camera.y - 100 && p.y < camera.y + canvas.height + 100) {
+                    renderList.push({...p, isPlayer: true});
+                }
+            });
+
+            // ----------------------------------------------------
+            // حل مشكلة العمق (Y-Sorting Fix) - الترابيزة دايماً تحت
+            // ----------------------------------------------------
+            renderList.forEach(item => {
+                item.sortY = item.y; // الافتراضي
+                if (!item.isPlayer && item.type === 'table') {
+                    item.sortY -= 200; // ده بيجبر الترابيزات تترسم الأول كخلفية، فاللاعب دايماً هيمشي "فوقها"
+                }
+            });
+
+            renderList.sort((a, b) => a.sortY - b.sortY);
+
+            renderList.forEach(item => {
+                if (item.isPlayer) { drawAvatar(item, (item.name === me.name && item.photoURL === me.photoURL)); } 
+                else { drawObject(item); }
+            });
+
+            drawSayed();
+            drawSmokeAndLighting();
+
+            ctx.restore(); 
+            requestAnimationFrame(gameLoop);
+        }
+
+    </script>
+</body>
+</html>
