@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القهوة - شلة الزبون</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><div class="logo1"><img src="images/logo1.png" class="logoimg"></div>القهوة</div>
+        <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="dashboard.html">الصالة</a></li>
+            <li><a href="profile.html">حسابي</a></li>
+        </ul>
+        <div class="nav-right" id="navAuth"></div>
+    </nav>
+
+    <div class="container">
+        <div style="margin-bottom: 1rem;">
+            <a id="backBtn" href="dashboard.html" style="color: var(--text-grey); font-size: 0.9rem;">
+                <i class="fa-solid fa-arrow-right"></i> رجوع لبروفايل الزبون
+            </a>
+        </div>
+
+        <div class="profile-layout">
+            <aside class="profile-sidebar">
+                <div class="profile-image-container">
+                    <img id="visitAvatar" src="images/user.png" class="profile-img-lg">
+                </div>
+                <h2 id="visitName">جاري التحميل...</h2>
+                <p id="visitRole" style="color:var(--text-grey); font-size:0.9rem;">زبون</p>
+                
+                <button id="viewProfileBtn" class="btn-outline" style="width:100%; margin-top:15px;">
+                    <i class="fa-solid fa-user"></i> عرض البروفايل
+                </button>
+            </aside>
+
+            <main>
+                <h1 style="color: var(--primary-blue); margin-bottom: 1.5rem;">شلة <span id="headerName">الزبون</span> 🤝</h1>
+                
+                <div id="friendsList" class="dashboard-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                    <div style="text-align: center; padding: 2rem; grid-column: 1/-1;">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x"></i> <br><br> بنجمع الشلة...
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+<script type="module">
+        import { auth, onAuthStateChanged, getUserFriends, getUserData } from './auth-service.js';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUserId = urlParams.get('uid');
+        
+        // --- متغير عشان نحفظ فيه الـ ID بتاعك ---
+        let currentUserId = null; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!targetUserId) {
+                alert("رابط غير صحيح");
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            document.getElementById('backBtn').href = `user.html?uid=${targetUserId}`;
+            document.getElementById('viewProfileBtn').onclick = () => window.location.href = `user.html?uid=${targetUserId}`;
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid; // <-- بنحفظ الـ ID بتاعك هنا
+                
+                if (user.uid === targetUserId) {
+                    window.location.href = 'friends.html';
+                    return;
+                }
+                await loadTargetDetails();
+                await loadFriends();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function loadTargetDetails() {
+            const res = await getUserData(targetUserId);
+            if(res.success) {
+                const data = res.data;
+                const name = data.fullName || 'زبون';
+                document.getElementById('visitName').textContent = name;
+                document.getElementById('headerName').textContent = name.split(' ')[0];
+                document.getElementById('visitRole').textContent = data.role || 'زبون';
+                document.getElementById('visitAvatar').src = data.profileImage || 'images/user.png';
+            }
+        }
+
+        async function loadFriends() {
+            const list = document.getElementById('friendsList');
+            const res = await getUserFriends(targetUserId);
+            
+            if (!res.success) {
+                 list.innerHTML = '<p style="color:red; text-align:center;">حصل خطأ في التحميل.</p>';
+                 return;
+            }
+
+            // --- السطر ده هو اللي بيفلتر ويشيلك إنت من الشلة الكاملة ---
+            const filteredFriends = res.data.filter(f => f.id !== currentUserId);
+
+            if (filteredFriends.length === 0) {
+                list.innerHTML = `<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: var(--text-grey);">
+                    <i class="fa-solid fa-user-group" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>لسه مفيش حد في شلة الزبون ده (أو إنت بس اللي فيها).</p>
+                </div>`;
+                return;
+            }
+
+            list.innerHTML = filteredFriends.map(f => `
+                <div class="uni-card" style="text-align:center; padding:1.5rem; border:1px solid var(--border-color);">
+                    <img src="${f.profileImage || f.photoURL || 'images/user.png'}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:2px solid var(--border-color);">
+                    <h3 style="font-size:1rem; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${f.fullName || 'زبون'}</h3>
+                    <p style="font-size:0.8rem; color:var(--text-grey); margin-bottom:15px;">${f.role || 'زبون'}</p>
+                    <button onclick="window.location.href='user.html?uid=${f.id}'" class="btn-primary" style="width:100%; font-size:0.85rem; padding:8px;">
+                        البروفايل
+                    </button>
+                </div>
+            `).join('');
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

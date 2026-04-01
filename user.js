@@ -46,6 +46,7 @@ const DRINKS_MAP = {
 document.addEventListener('DOMContentLoaded', () => {
     injectStyles();
     createReactorsModal();
+    createImagePreviewModalUser();
 
     const urlParams = new URLSearchParams(window.location.search);
     targetUserId = urlParams.get('uid');
@@ -73,24 +74,46 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadTargetProfile() {
     // 1. Load User Info
     const userRes = await getUserData(targetUserId);
+
     
     if (userRes.success) {
         const data = userRes.data;
-        document.getElementById('visitUserName').textContent = data.fullName || 'زبون مجهول';
+        // document.getElementById('visitUserName').textContent = data.fullName || 'زبون مجهول';
         
-        let headerName = (data.fullName || 'الزبون').split(' ')[0]; 
-        // --- FIXED: Signature Drink Logic ---
+        // let headerName = (data.fullName || 'الزبون').split(' ')[0]; 
+        // // --- FIXED: Signature Drink Logic ---
+        // if (data.signatureDrink && DRINKS_MAP[data.signatureDrink]) {
+        //      headerName += ` <span style="font-size: 0.8rem; background: #fff3cd; color: #856404; padding: 3px 10px; border-radius: 15px; vertical-align: middle;">${DRINKS_MAP[data.signatureDrink]}</span>`;
+        // }
+        // document.getElementById('headerName').innerHTML = headerName;
+        // 1. نظبط الاسم في الكارت اللي على اليمين ونحط تحته البادج
+        let nameHtml = data.fullName || 'زبون مجهول';
         if (data.signatureDrink && DRINKS_MAP[data.signatureDrink]) {
-             headerName += ` <span style="font-size: 0.8rem; background: #fff3cd; color: #856404; padding: 3px 10px; border-radius: 15px; vertical-align: middle;">${DRINKS_MAP[data.signatureDrink]}</span>`;
+             // استخدمنا <br> عشان البادج ينزل تحت الاسم وشكله يكون مظبوط
+             nameHtml += `<br><span style="font-size: 0.8rem; background: #fff8e1; color: #f57f17; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; border: 1px solid #ffe082;">
+                مشروبه: ${DRINKS_MAP[data.signatureDrink]}
+            </span>`;
         }
-        document.getElementById('headerName').innerHTML = headerName;
+        document.getElementById('visitUserName').innerHTML = nameHtml;
+        
+        // 2. نخلي العنوان اللي فوق (الصفحة الشخصية لـ) اسم بس من غير البادج
+        let headerName = (data.fullName || 'الزبون').split(' ')[0]; 
+        document.getElementById('headerName').textContent = headerName;
         document.getElementById('visitUserEducation').textContent = data.educationLevel || 'زبون جديد';
         document.getElementById('visitUserBio').textContent = data.bio || 'أنا جديد في القهوة';
         const rankEl = document.getElementById('visitUserRank');
         if (rankEl) rankEl.textContent = data.role || 'زبون';
-        const imgEl = document.getElementById('visitProfileImage');
-        imgEl.src = data.profileImage || 'images/user.png';
-        imgEl.onerror = () => { imgEl.src = 'images/user.png'; };
+            // جوه دالة loadTargetProfile() هتلاقي السطرين دول:
+const imgEl = document.getElementById('visitProfileImage');
+imgEl.src = data.profileImage || 'images/user.png';
+
+// ضيف تحتهم الكود ده:
+imgEl.onerror = () => { imgEl.src = 'images/user.png'; };
+imgEl.style.cursor = 'pointer';
+imgEl.onclick = () => openImagePreviewUser(imgEl.src);
+        // const imgEl = document.getElementById('visitProfileImage');
+        // imgEl.src = data.profileImage || 'images/user.png';
+        // imgEl.onerror = () => { imgEl.src = 'images/user.png'; };
 
         setupFriendButton();
         loadFriendsList(); // Load friends for visited user
@@ -210,7 +233,32 @@ const btnChat = document.getElementById('btnChat');
     }
 }
 
-// --- NEW: Load Friends List for Visited User ---
+// // --- NEW: Load Friends List for Visited User ---
+// async function loadFriendsList() {
+//     const listEl = document.getElementById('visitUserFriendsList');
+//     if (!listEl) return;
+    
+//     const result = await getUserFriends(targetUserId);
+    
+//     if(result.success) {
+//         if(result.data.length === 0) {
+//             listEl.innerHTML = '<p style="color:var(--text-grey); font-size:0.9rem;">لسه معندوش شلة.</p>';
+//         } else {
+//             listEl.innerHTML = result.data.map(f => `
+//                 <div onclick="window.location.href='user.html?uid=${f.id}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; cursor:pointer; width:60px;">
+//                     <img src="${f.profileImage || f.photoURL || 'images/user.png'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--border-color);">
+//                     <span style="font-size:0.7rem; color:var(--text-dark); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; width:100%; text-align:center;">
+//                         ${(f.fullName||'زبون').split(' ')[0]}
+//                     </span>
+//                 </div>
+//             `).join('');
+//         }
+//     } else {
+//         listEl.innerHTML = '<p style="color:red; font-size:0.8rem;">خطأ تحميل</p>';
+//     }
+// }
+
+// استبدل الدالة دي بالكامل في ملف user.js
 async function loadFriendsList() {
     const listEl = document.getElementById('visitUserFriendsList');
     if (!listEl) return;
@@ -218,10 +266,14 @@ async function loadFriendsList() {
     const result = await getUserFriends(targetUserId);
     
     if(result.success) {
-        if(result.data.length === 0) {
-            listEl.innerHTML = '<p style="color:var(--text-grey); font-size:0.9rem;">لسه معندوش شلة.</p>';
+        // --- السطر ده هو اللي بيفلتر وبيشيلك إنت من الشلة ---
+        const filteredFriends = result.data.filter(f => f.id !== currentUser.uid);
+
+        if(filteredFriends.length === 0) {
+            listEl.innerHTML = '<p style="color:var(--text-grey); font-size:0.9rem;">لسه معندوش شلة (أو إنت بس اللي فيها).</p>';
         } else {
-            listEl.innerHTML = result.data.map(f => `
+            const displayedFriends = filteredFriends.slice(0, 5);
+            let html = displayedFriends.map(f => `
                 <div onclick="window.location.href='user.html?uid=${f.id}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; cursor:pointer; width:60px;">
                     <img src="${f.profileImage || f.photoURL || 'images/user.png'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--border-color);">
                     <span style="font-size:0.7rem; color:var(--text-dark); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; width:100%; text-align:center;">
@@ -229,12 +281,58 @@ async function loadFriendsList() {
                     </span>
                 </div>
             `).join('');
+
+            if (filteredFriends.length > 0) {
+                html += `
+                <div onclick="window.location.href='user-friends.html?uid=${targetUserId}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; justify-content:center; cursor:pointer; width:60px;">
+                    <div style="width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.05); border:1px dashed var(--text-grey);">
+                        <i class="fa-solid fa-ellipsis" style="color:var(--text-grey);"></i>
+                    </div>
+                    <span style="font-size:0.7rem; color:var(--primary-blue); margin-top:3px; font-weight:bold;">الكل</span>
+                </div>`;
+            }
+            listEl.innerHTML = html;
         }
     } else {
         listEl.innerHTML = '<p style="color:red; font-size:0.8rem;">خطأ تحميل</p>';
     }
 }
 
+// async function loadFriendsList() {
+//     const listEl = document.getElementById('visitUserFriendsList');
+//     if (!listEl) return;
+    
+//     const result = await getUserFriends(targetUserId);
+    
+//     if(result.success) {
+//         if(result.data.length === 0) {
+//             listEl.innerHTML = '<p style="color:var(--text-grey); font-size:0.9rem;">لسه معندوش شلة.</p>';
+//         } else {
+//             const displayedFriends = result.data.slice(0, 5);
+//             let html = displayedFriends.map(f => `
+//                 <div onclick="window.location.href='user.html?uid=${f.id}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; cursor:pointer; width:60px;">
+//                     <img src="${f.profileImage || f.photoURL || 'images/user.png'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--border-color);">
+//                     <span style="font-size:0.7rem; color:var(--text-dark); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; width:100%; text-align:center;">
+//                         ${(f.fullName||'زبون').split(' ')[0]}
+//                     </span>
+//                 </div>
+//             `).join('');
+
+//             if (result.data.length > 0) {
+//                 html += `
+//                 <div onclick="window.location.href='user-friends.html?uid=${targetUserId}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; justify-content:center; cursor:pointer; width:60px;">
+//                     <div style="width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.05); border:1px dashed var(--text-grey);">
+//                         <i class="fa-solid fa-ellipsis" style="color:var(--text-grey);"></i>
+//                     </div>
+//                     <span style="font-size:0.7rem; color:var(--primary-blue); margin-top:3px; font-weight:bold;">الكل</span>
+//                 </div>`;
+//             }
+//             listEl.innerHTML = html;
+//         }
+//     } else {
+//         listEl.innerHTML = '<p style="color:red; font-size:0.8rem;">خطأ تحميل</p>';
+//     }
+// }
 function createPostHTML(post) {
     let reactions = {};
     if (Array.isArray(post.likes)) post.likes.forEach(uid => reactions[uid] = 'like');
@@ -374,3 +472,23 @@ function createReactorsModal() {
     div.innerHTML = `<div class="custom-modal-content"><div class="custom-modal-header"><span>التفاعل</span><span onclick="this.parentElement.parentElement.parentElement.style.display='none'" style="cursor:pointer">&times;</span></div><div class="custom-modal-body" id="reactorsList"></div></div>`;
     document.body.appendChild(div);
 }
+
+
+function createImagePreviewModalUser() {
+    if (document.getElementById('imgPreviewModalUser')) return;
+    const modal = document.createElement('div');
+    modal.id = 'imgPreviewModalUser';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; cursor:pointer; backdrop-filter:blur(5px); animation: fadeIn 0.2s;';
+    modal.innerHTML = `
+        <span style="position:absolute; top:20px; right:30px; color:white; font-size:40px; font-weight:bold; cursor:pointer; z-index:100000;">&times;</span>
+        <img id="previewModalImgUser" style="max-width:90%; max-height:90%; object-fit:contain; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.5);">
+    `;
+    modal.onclick = () => modal.style.display = 'none';
+    document.body.appendChild(modal);
+}
+
+window.openImagePreviewUser = function(src) {
+    const modal = document.getElementById('imgPreviewModalUser');
+    document.getElementById('previewModalImgUser').src = src;
+    modal.style.display = 'flex';
+};

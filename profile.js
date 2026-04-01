@@ -43,6 +43,7 @@ const DRINKS_MAP = {
 document.addEventListener('DOMContentLoaded', () => {
     injectStylesProfile();
     createReactorsModalProfile();
+    createImagePreviewModal();
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -70,8 +71,15 @@ function updateProfileInfo() {
     const eduEl = document.getElementById('userEducation');
     const emailEl = document.getElementById('userEmail');
     const bioEl = document.getElementById('userBio');
+    
+    if(imgEl) {
+        imgEl.src = userData.profileImage || 'images/user.png';
+        // --- أكواد الـ Preview الجديدة ---
+        imgEl.style.cursor = 'pointer';
+        imgEl.onclick = () => openImagePreview(imgEl.src);
+    }
 
-    if(imgEl) imgEl.src = userData.profileImage || 'images/user.png';
+    // if(imgEl) imgEl.src = userData.profileImage || 'images/user.png';
     
     // --- Display Signature Drink ---
     if(nameEl) {
@@ -93,6 +101,26 @@ function updateProfileInfo() {
     if(rankEl) rankEl.textContent = userData.role || 'زبون'; 
 }
 
+// async function loadMyFriends() {
+//     const listEl = document.getElementById('myFriendsList');
+//     if(!listEl) return;
+    
+//     const result = await getUserFriends(currentUser.uid);
+//     if(result.success) {
+//         if(result.data.length === 0) {
+//             listEl.innerHTML = '<p style="color:var(--text-grey); font-size:0.9rem;">لسه مفيش حد في الشلة.</p>';
+//         } else {
+//             listEl.innerHTML = result.data.map(f => `
+//                 <div onclick="window.location.href='user.html?uid=${f.id}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; cursor:pointer; width:60px;">
+//                     <img src="${f.profileImage || f.photoURL || 'images/user.png'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--border-color);">
+//                     <span style="font-size:0.7rem; color:var(--text-dark); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; width:100%; text-align:center;">
+//                         ${(f.fullName||'زبون').split(' ')[0]}
+//                     </span>
+//                 </div>
+//             `).join('');
+//         }
+//     }
+// }
 async function loadMyFriends() {
     const listEl = document.getElementById('myFriendsList');
     if(!listEl) return;
@@ -102,7 +130,9 @@ async function loadMyFriends() {
         if(result.data.length === 0) {
             listEl.innerHTML = '<p style="color:var(--text-grey); font-size:0.9rem;">لسه مفيش حد في الشلة.</p>';
         } else {
-            listEl.innerHTML = result.data.map(f => `
+            // عرض 5 أصدقاء بس
+            const displayedFriends = result.data.slice(0, 5);
+            let html = displayedFriends.map(f => `
                 <div onclick="window.location.href='user.html?uid=${f.id}'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; cursor:pointer; width:60px;">
                     <img src="${f.profileImage || f.photoURL || 'images/user.png'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--border-color);">
                     <span style="font-size:0.7rem; color:var(--text-dark); overflow:hidden; white-space:nowrap; text-overflow:ellipsis; width:100%; text-align:center;">
@@ -110,10 +140,21 @@ async function loadMyFriends() {
                     </span>
                 </div>
             `).join('');
+
+            // زرار عرض الكل لو عنده أصدقاء
+            if (result.data.length > 0) {
+                html += `
+                <div onclick="window.location.href='friends.html'" style="display:inline-flex; flex-direction:column; align-items:center; margin:5px; justify-content:center; cursor:pointer; width:60px;">
+                    <div style="width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.05); border:1px dashed var(--text-grey);">
+                        <i class="fa-solid fa-ellipsis" style="color:var(--text-grey);"></i>
+                    </div>
+                    <span style="font-size:0.7rem; color:var(--primary-blue); margin-top:3px; font-weight:bold;">الكل</span>
+                </div>`;
+            }
+            listEl.innerHTML = html;
         }
     }
 }
-
 async function loadUserStatsAndPosts() {
     const postsListEl = document.getElementById('userPostsList');
     
@@ -433,3 +474,24 @@ function createReactorsModalProfile() {
         if(e.target === div) div.style.display = 'none';
     });
 }
+
+
+// --- دوال عرض الصورة (Image Preview) ---
+function createImagePreviewModal() {
+    if (document.getElementById('imgPreviewModal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'imgPreviewModal';
+    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center; cursor:pointer; backdrop-filter:blur(5px); animation: fadeIn 0.2s;';
+    modal.innerHTML = `
+        <span style="position:absolute; top:20px; right:30px; color:white; font-size:40px; font-weight:bold; cursor:pointer; z-index:100000;">&times;</span>
+        <img id="previewModalImg" style="max-width:90%; max-height:90%; object-fit:contain; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.5);">
+    `;
+    modal.onclick = () => modal.style.display = 'none';
+    document.body.appendChild(modal);
+}
+
+window.openImagePreview = function(src) {
+    const modal = document.getElementById('imgPreviewModal');
+    document.getElementById('previewModalImg').src = src;
+    modal.style.display = 'flex';
+};
