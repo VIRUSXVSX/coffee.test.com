@@ -14,12 +14,22 @@ let selectedSpeakerId = 'default';
 let lastUnmuteTrigger = 0; 
 let isListeningRequests = false; 
 
-// تخزين الأنيميشن الخاص بكل مستخدم لمنع التداخل
+// ================= GLOBAL AUDIO ENGINE =================
+// FIX: We must use one shared AudioContext to prevent browser crashes and autoplay blocks.
+let sharedAudioContext = null;
 const activeVisualizers = {};
-
 const peerConnections = {}; 
-const ICE_SERVERS = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+const ICE_SERVERS = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
 const ROOM_TIMEOUT = 10 * 60 * 1000; 
+
+function initAudioEngine() {
+    if (!sharedAudioContext) {
+        sharedAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (sharedAudioContext.state === 'suspended') {
+        sharedAudioContext.resume();
+    }
+}
 
 // ================= TOAST =================
 function showToast(message, type = 'info') {
@@ -142,18 +152,22 @@ function bindGlobalEvents() {
     });
 }
 
-// ================= DEVICE MANAGEMENT (MODERNIZED) =================
+// ================= DEVICE MANAGEMENT =================
 async function requestMicPermission(deviceId = null) {
     try {
         const constraints = { audio: deviceId ? { deviceId: { exact: deviceId } } : true, video: false };
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
         document.getElementById('micStatusText').innerText = "المايك شغال 🎙️"; document.getElementById('micStatusText').style.color = "#2ecc71";
+        
         if(isMuted) localStream.getAudioTracks()[0].enabled = false;
         
+        // Start visualizer for lobby
+        initAudioEngine();
         startVisualizer(localStream, 'micPreview', true);
         updatePreJoinMicUI();
         return true;
     } catch (err) {
+        console.error("Mic error:", err);
         localStream = null; isMuted = true;
         document.getElementById('micStatusText').innerText = "هتدخل مستمع 🎧"; document.getElementById('micStatusText').style.color = "#ea4335";
         updatePreJoinMicUI(); return false;
@@ -180,7 +194,6 @@ async function loadAudioDevices() {
             micSelect.appendChild(opt);
         });
 
-        // Speaker support check (Firefox/Safari issues)
         if (typeof HTMLAudioElement.prototype.setSinkId === 'undefined') {
             speakerSelect.disabled = true;
             speakerSelect.innerHTML = '<option value="">الافتراضي</option>';
@@ -204,10 +217,19 @@ async function switchMicrophone(deviceId) {
     try {
         const newStream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: { exact: deviceId } } });
         const newTrack = newStream.getAudioTracks()[0];
-        if(localStream) { localStream.removeTrack(localStream.getAudioTracks()[0]); localStream.addTrack(newTrack); } else { localStream = newStream; }
+        if(localStream) { 
+            localStream.getAudioTracks().forEach(t => t.stop());
+            localStream.removeTrack(localStream.getAudioTracks()[0]); 
+            localStream.addTrack(newTrack); 
+        } else { 
+            localStream = newStream; 
+        }
         newTrack.enabled = !isMuted;
         
-        Object.values(peerConnections).forEach(pc => { const sender = pc.getSenders().find(s => s.track && s.track.kind === 'audio'); if(sender) sender.replaceTrack(newTrack); });
+        Object.values(peerConnections).forEach(pc => { 
+            const sender = pc.getSenders().find(s => s.track && s.track.kind === 'audio'); 
+            if(sender) sender.replaceTrack(newTrack); 
+        });
         
         startVisualizer(localStream, roomId ? `card_${currentUser.uid}` : 'micPreview', true);
         showToast("تم تغيير المايك", "success");
@@ -227,8 +249,17 @@ async function switchSpeaker(deviceId) {
 }
 
 async function togglePreJoinMic() {
-    if (isMuted) { if (!localStream) { const ok = await requestMicPermission(); if(!ok) return; } isMuted = false; if(localStream) localStream.getAudioTracks()[0].enabled = true; } 
-    else { isMuted = true; if(localStream) localStream.getAudioTracks()[0].enabled = false; }
+    initAudioEngine();
+    if (isMuted) { 
+        if (!localStream) { 
+            const ok = await requestMicPermission(); if(!ok) return; 
+        } 
+        isMuted = false; 
+        if(localStream) localStream.getAudioTracks()[0].enabled = true; 
+    } else { 
+        isMuted = true; 
+        if(localStream) localStream.getAudioTracks()[0].enabled = false; 
+    }
     updatePreJoinMicUI();
 }
 
@@ -240,6 +271,7 @@ function updatePreJoinMicUI() {
 
 // ================= ROOM MANAGEMENT =================
 async function createRoom() {
+    initAudioEngine(); // Crucial to bypass autoplay blocks
     const name = document.getElementById('roomNameInput').value.trim() || "قعدة رايقة";
     const privacy = document.getElementById('roomPrivacy').value;
     roomId = 'room_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
@@ -253,6 +285,7 @@ async function createRoom() {
 }
 
 async function attemptJoinRoom() {
+    initAudioEngine(); // Crucial to bypass autoplay blocks
     const infoSnap = await get(ref(rtdb, `rooms/${roomId}/info`));
     const info = infoSnap.val();
     
@@ -293,7 +326,9 @@ function enterRoomInterface() {
     connectToPeers();
     setupChatListeners();
 
-    if (localStream && !isMuted) startVisualizer(localStream, `card_${currentUser.uid}`, true);
+    if (localStream && !isMuted) {
+        startVisualizer(localStream, `card_${currentUser.uid}`, true);
+    }
 }
 
 function setupRoomListeners() {
@@ -320,13 +355,15 @@ function setupRoomListeners() {
     const myRef = ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}`);
     set(myRef, { name: currentUser.displayName || 'زبون', photo: currentUser.photoURL || 'images/user.png', isMuted: isMuted, forceMuted: false, unmuteTrigger: 0 });
     onDisconnect(myRef).remove(); 
+    // FIX: Clear signaling data on disconnect
+    onDisconnect(ref(rtdb, `rooms/${roomId}/signaling/${currentUser.uid}`)).remove();
 
     onValue(ref(rtdb, `rooms/${roomId}/participants`), (snap) => {
         const participants = snap.val() || {};
         updateParticipantsUI(participants);
 
         const me = participants[currentUser.uid];
-        if(!me) { showToast("تم طردك.", "error"); setTimeout(() => window.location.href = 'dashboard.html', 1500); return; }
+        if(!me) { showToast("تم خروجك.", "error"); setTimeout(() => window.location.href = 'dashboard.html', 1500); return; }
         
         if (me.forceMuted && !isMuted) {
             enforceMute();
@@ -380,7 +417,21 @@ function updateParticipantsUI(participants) {
         const micClass = p.isMuted ? 'muted' : 'active'; const micIcon = p.isMuted ? '<i class="fa-solid fa-microphone-slash"></i>' : '<i class="fa-solid fa-microphone"></i>';
         
         let card = document.getElementById(`card_${uid}`);
-        if (!card) { card = document.createElement('div'); card.className = 'participant-card'; card.id = `card_${uid}`; grid.appendChild(card); }
+        if (!card) { 
+            card = document.createElement('div'); 
+            card.className = 'participant-card'; 
+            card.id = `card_${uid}`; 
+            grid.appendChild(card); 
+            // Restart visualizer if stream already exists
+            if (!isMe && peerConnections[uid]) {
+                const receivers = peerConnections[uid].getReceivers();
+                if (receivers.length > 0 && receivers[0].track) {
+                    const stream = new MediaStream([receivers[0].track]);
+                    startVisualizer(stream, `card_${uid}`, false);
+                }
+            }
+        }
+        
         card.innerHTML = `<div class="mic-status-icon ${micClass}">${micIcon}</div><img src="${p.photo}"><div class="participant-name">${p.name}</div>`;
 
         let adminHtml = '';
@@ -403,6 +454,7 @@ function enforceMute() {
 }
 
 async function toggleMainMic() {
+    initAudioEngine();
     if (!localStream && isMuted) { const ok = await requestMicPermission(selectedMicId); if(!ok) return; }
     get(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}/forceMuted`)).then(snap => {
         if (snap.val() === true) { showToast("ممنوع تفتح المايك.", "error"); return; }
@@ -415,31 +467,31 @@ async function toggleMainMic() {
 
 function updateActiveMicUI() {
     const btn = document.getElementById('toggleMicBtn'); if(!btn) return;
-    if (isMuted) { btn.classList.add('muted'); btn.innerHTML = '<i class="fa-solid fa-microphone-slash"></i>'; } 
-    else { btn.classList.remove('muted'); btn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; if(localStream) startVisualizer(localStream, `card_${currentUser.uid}`, true); }
+    if (isMuted) { 
+        btn.classList.add('muted'); btn.innerHTML = '<i class="fa-solid fa-microphone-slash"></i>'; 
+        const meCard = document.getElementById(`card_${currentUser.uid}`);
+        if(meCard) { meCard.classList.remove('speaking'); meCard.classList.remove('active'); }
+    } else { 
+        btn.classList.remove('muted'); btn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; 
+        if(localStream) startVisualizer(localStream, `card_${currentUser.uid}`, true); 
+    }
 }
 
-// ================= WEBRTC MESH & AUDIO =================
+// ================= WEBRTC MESH (FIXED SIGNALING) =================
 function connectToPeers() {
     onValue(ref(rtdb, `rooms/${roomId}/participants`), (snap) => {
         const participants = snap.val() || {};
 
-        // FIX 1: Cleanup disconnected peers
-        // If someone leaves or refreshes, we must destroy their WebRTC connection and audio element
+        // 1. Disconnect dropped peers perfectly
         Object.keys(peerConnections).forEach(uid => {
             if (!participants[uid]) {
-                peerConnections[uid].close();
-                delete peerConnections[uid];
-                const audioEl = document.getElementById(`audio_${uid}`);
-                if (audioEl) audioEl.remove();
+                closeConnection(uid);
             }
         });
 
-        // FIX 2: Prevent WebRTC Glare
+        // 2. Prevent Glare by strictly ordering calls
         Object.keys(participants).forEach(uid => {
             if (uid !== currentUser.uid && !peerConnections[uid]) {
-                // By comparing UIDs, we force ONLY ONE user to be the caller.
-                // The other user will naturally wait to receive the offer, perfectly completing the handshake.
                 if (currentUser.uid < uid) {
                     initiateCall(uid);
                 }
@@ -447,28 +499,95 @@ function connectToPeers() {
         });
     });
 
-    onValue(ref(rtdb, `rooms/${roomId}/signaling/${currentUser.uid}`), (snap) => {
+    onValue(ref(rtdb, `rooms/${roomId}/signaling/${currentUser.uid}`), async (snap) => {
         const data = snap.val(); if (!data) return;
-        Object.keys(data).forEach(async (senderUid) => {
+        
+        for (const senderUid of Object.keys(data)) {
             const signal = data[senderUid];
-            if (signal.offer && !peerConnections[senderUid]) await answerCall(senderUid, signal.offer);
-            if (signal.answer && peerConnections[senderUid]) { 
-                const pc = peerConnections[senderUid]; 
-                if (pc.signalingState !== "stable") await pc.setRemoteDescription(new RTCSessionDescription(signal.answer)); 
+
+            if (signal.offer && !peerConnections[senderUid]) {
+                await answerCall(senderUid, signal.offer);
             }
-            if (signal.ice_candidates && peerConnections[senderUid] && peerConnections[senderUid].remoteDescription) { 
-                Object.values(signal.ice_candidates).forEach(async (c) => { 
-                    try { await peerConnections[senderUid].addIceCandidate(new RTCIceCandidate(c)); } catch(e){} 
-                }); 
+
+            if (signal.answer && peerConnections[senderUid]) {
+                const pc = peerConnections[senderUid];
+                if (pc.signalingState === 'have-local-offer') {
+                    try { await pc.setRemoteDescription(new RTCSessionDescription(signal.answer)); } catch(e){}
+                }
             }
-        });
+
+            if (signal.ice_candidates && peerConnections[senderUid]) {
+                const pc = peerConnections[senderUid];
+                if (pc.remoteDescription) {
+                    Object.values(signal.ice_candidates).forEach(async (c) => {
+                        try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch(e){}
+                    });
+                }
+            }
+        }
     });
 }
 
-async function initiateCall(targetUid) { 
-    // FIX 3: Clear old signaling data from previous sessions before starting a new call
-    await remove(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}`));
+function closeConnection(uid) {
+    if (peerConnections[uid]) {
+        peerConnections[uid].close();
+        delete peerConnections[uid];
+    }
+    const audioEl = document.getElementById(`audio_${uid}`);
+    if (audioEl) audioEl.remove();
+    
+    if (activeVisualizers[`card_${uid}`]) {
+        cancelAnimationFrame(activeVisualizers[`card_${uid}`].frameId);
+        delete activeVisualizers[`card_${uid}`];
+    }
+    // Clean up signaling for this user
+    remove(ref(rtdb, `rooms/${roomId}/signaling/${currentUser.uid}/${uid}`));
+}
 
+function createPeerConnection(targetUid) {
+    const pc = new RTCPeerConnection(ICE_SERVERS);
+    if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    
+    pc.ontrack = (event) => {
+        let audioEl = document.getElementById(`audio_${targetUid}`);
+        if (!audioEl) { 
+            audioEl = document.createElement('audio'); 
+            audioEl.id = `audio_${targetUid}`; 
+            audioEl.autoplay = true; 
+            document.body.appendChild(audioEl); 
+        }
+        audioEl.srcObject = event.streams[0];
+        
+        if (typeof audioEl.setSinkId !== 'undefined' && selectedSpeakerId !== 'default') {
+            audioEl.setSinkId(selectedSpeakerId).catch(()=>{});
+        }
+        
+        // This play function requires user interaction first, which we solved by calling initAudioEngine() on button clicks
+        audioEl.play().catch(e => console.warn("Audio block, user needs to interact with page."));
+        
+        // Start remote visualizer for the card
+        startVisualizer(event.streams[0], `card_${targetUid}`, false);
+    };
+
+    pc.onicecandidate = (e) => { 
+        if (e.candidate) {
+            push(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/ice_candidates`), e.candidate.toJSON()); 
+        }
+    };
+    
+    pc.onconnectionstatechange = () => { 
+        if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') { 
+            closeConnection(targetUid);
+        } 
+    };
+    
+    peerConnections[targetUid] = pc; 
+    return pc;
+}
+
+async function initiateCall(targetUid) { 
+    // Delete old data before calling to start fresh
+    await remove(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}`));
     const pc = createPeerConnection(targetUid); 
     const offer = await pc.createOffer(); 
     await pc.setLocalDescription(offer); 
@@ -476,40 +595,46 @@ async function initiateCall(targetUid) {
 }
 
 async function answerCall(targetUid, offerData) { 
-    // FIX 4: Clear old signaling data before answering to prevent stale ICE candidates
     await remove(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}`));
-
     const pc = createPeerConnection(targetUid); 
     await pc.setRemoteDescription(new RTCSessionDescription(offerData)); 
     const answer = await pc.createAnswer(); 
     await pc.setLocalDescription(answer); 
     await set(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/answer`), { type: answer.type, sdp: answer.sdp }); 
 }
-// ================= MODERN VISUALIZER =================
+
+// ================= ROBUST VISUALIZER (FIXED) =================
 function startVisualizer(stream, targetId, isLocal) {
     if (!stream) return;
-    
+    initAudioEngine(); // Ensure context is running
+
+    // Clear old visualizer to prevent overlapping animations
     if (activeVisualizers[targetId]) {
         cancelAnimationFrame(activeVisualizers[targetId].frameId);
-        if(activeVisualizers[targetId].ctx) activeVisualizers[targetId].ctx.close();
+        if (activeVisualizers[targetId].source) {
+            try { activeVisualizers[targetId].source.disconnect(); } catch(e){}
+        }
     }
 
     try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioCtx.createAnalyser();
-        analyser.smoothingTimeConstant = 0.8;
+        const analyser = sharedAudioContext.createAnalyser();
+        analyser.smoothingTimeConstant = 0.5; // Makes animation snappier
         analyser.fftSize = 256;
 
-        const src = audioCtx.createMediaStreamSource(stream);
-        src.connect(analyser); // We do NOT connect to destination to avoid echo
+        const src = sharedAudioContext.createMediaStreamSource(stream);
+        src.connect(analyser); // Connect to analyser, but NOT to speakers (to avoid echo)
 
         const array = new Uint8Array(analyser.frequencyBinCount);
 
         function update() {
+            activeVisualizers[targetId].frameId = requestAnimationFrame(update);
+
+            const el = document.getElementById(targetId);
+            if (!el) return; // Wait for UI card to load
+
+            // If it's my local mic and I'm muted, forcefully shut off animation
             if (isLocal && isMuted) {
-                const el = document.getElementById(targetId);
-                if (el) el.classList.remove('active', 'speaking');
-                activeVisualizers[targetId].frameId = requestAnimationFrame(update);
+                el.classList.remove('active', 'speaking');
                 return;
             }
 
@@ -518,20 +643,20 @@ function startVisualizer(stream, targetId, isLocal) {
             for (let i = 0; i < array.length; i++) values += array[i];
             const avg = values / array.length;
 
-            const el = document.getElementById(targetId);
-            if (el) {
-                if (avg > 15) {
-                    el.classList.add('speaking');
-                    if(isLocal) el.classList.add('active'); // For lobby circle
-                } else {
-                    el.classList.remove('speaking');
-                    if(isLocal) el.classList.remove('active');
-                }
+            // 15 is the sensitivity threshold. Above 15 = speaking.
+            if (avg > 15) {
+                el.classList.add('speaking');
+                if(isLocal) el.classList.add('active'); 
+            } else {
+                el.classList.remove('speaking');
+                if(isLocal) el.classList.remove('active');
             }
-            activeVisualizers[targetId].frameId = requestAnimationFrame(update);
         }
         
-        activeVisualizers[targetId] = { ctx: audioCtx, frameId: requestAnimationFrame(update) };
+        activeVisualizers[targetId] = { 
+            source: src, 
+            frameId: requestAnimationFrame(update) 
+        };
     } catch(e) { console.warn("Visualizer Error", e); }
 }
 
@@ -579,6 +704,9 @@ function openLeaveModal() {
 
 window.executeLeave = (type) => { 
     if (type === 'close_all' && isRoomAdmin) remove(ref(rtdb, `rooms/${roomId}`));
-    else remove(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}`));
+    else {
+        remove(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}`));
+        remove(ref(rtdb, `rooms/${roomId}/signaling/${currentUser.uid}`));
+    }
     window.location.href = 'dashboard.html'; 
 }
