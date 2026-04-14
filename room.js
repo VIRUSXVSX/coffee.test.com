@@ -9,10 +9,13 @@ let localStream = null;
 let isMuted = false; 
 let isRoomAdmin = false;
 let roomData = null;
-let localAnalyserInterval = null; 
 let selectedMicId = 'default';
+let selectedSpeakerId = 'default';
 let lastUnmuteTrigger = 0; 
-let isListeningRequests = false; // لمنع تكرار الـ Listeners
+let isListeningRequests = false; 
+
+// تخزين الأنيميشن الخاص بكل مستخدم لمنع التداخل
+const activeVisualizers = {};
 
 const peerConnections = {}; 
 const ICE_SERVERS = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
@@ -65,7 +68,6 @@ async function initSetup() {
             setTimeout(()=> window.location.href = 'dashboard.html', 2000);
             return;
         }
-
         setupTitle.innerText = "جاهز للدخول؟";
         setupDesc.innerText = "ظبط مايكك ودوس انضم.";
         joinControls.style.display = 'block';
@@ -76,7 +78,6 @@ async function checkRoomValidity(id) {
     const snap = await get(ref(rtdb, `rooms/${id}/info`));
     if(!snap.exists()) return false;
     const info = snap.val();
-    
     if (info.lastActive && (Date.now() - info.lastActive > ROOM_TIMEOUT)) {
         remove(ref(rtdb, `rooms/${id}`)); 
         return false;
@@ -120,18 +121,17 @@ function bindGlobalEvents() {
         showToast("تم نسخ الرابط!", "success");
     });
 
-    // تغيير الخصوصية من المعلم
     document.getElementById('adminPrivacySelect')?.addEventListener('change', (e) => {
-        if (isRoomAdmin) {
-            update(ref(rtdb, `rooms/${roomId}/info`), { privacy: e.target.value });
-            showToast("تم تحديث حالة الغرفة", "success");
-        }
+        if (isRoomAdmin) { update(ref(rtdb, `rooms/${roomId}/info`), { privacy: e.target.value }); showToast("تم التحديث", "success"); }
     });
 
+    // Device Changing
     document.getElementById('micSelect')?.addEventListener('change', (e) => switchMicrophone(e.target.value));
+    document.getElementById('speakerSelect')?.addEventListener('change', (e) => switchSpeaker(e.target.value));
+    
     document.getElementById('sendRoomChatBtn')?.addEventListener('click', sendMessage);
     document.getElementById('roomChatInput')?.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
-
+    
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -142,14 +142,16 @@ function bindGlobalEvents() {
     });
 }
 
-// ================= DEVICE MANAGEMENT =================
+// ================= DEVICE MANAGEMENT (MODERNIZED) =================
 async function requestMicPermission(deviceId = null) {
     try {
         const constraints = { audio: deviceId ? { deviceId: { exact: deviceId } } : true, video: false };
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
         document.getElementById('micStatusText').innerText = "المايك شغال 🎙️"; document.getElementById('micStatusText').style.color = "#2ecc71";
         if(isMuted) localStream.getAudioTracks()[0].enabled = false;
-        detectLocalSpeaking(localStream, 'micPreview'); updatePreJoinMicUI();
+        
+        startVisualizer(localStream, 'micPreview', true);
+        updatePreJoinMicUI();
         return true;
     } catch (err) {
         localStream = null; isMuted = true;
@@ -161,15 +163,38 @@ async function requestMicPermission(deviceId = null) {
 async function loadAudioDevices() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const audioInputs = devices.filter(d => d.kind === 'audioinput');
-        const select = document.getElementById('micSelect'); select.innerHTML = '';
-        if(audioInputs.length === 0) { select.innerHTML = '<option>مفيش مايك</option>'; return; }
-        audioInputs.forEach(device => {
-            const option = document.createElement('option');
-            option.value = device.deviceId; option.text = device.label || `مايك ${select.length + 1}`;
-            if (device.deviceId === selectedMicId) option.selected = true;
-            select.appendChild(option);
+        const micSelect = document.getElementById('micSelect');
+        const speakerSelect = document.getElementById('speakerSelect');
+        const speakerWarning = document.getElementById('speakerWarning');
+        
+        micSelect.innerHTML = ''; speakerSelect.innerHTML = '';
+
+        const mics = devices.filter(d => d.kind === 'audioinput');
+        const speakers = devices.filter(d => d.kind === 'audiooutput');
+
+        if(mics.length === 0) micSelect.innerHTML = '<option value="">مفيش مايك</option>';
+        mics.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d.deviceId; opt.text = d.label || `مايك ${micSelect.length + 1}`;
+            if (d.deviceId === selectedMicId) opt.selected = true;
+            micSelect.appendChild(opt);
         });
+
+        // Speaker support check (Firefox/Safari issues)
+        if (typeof HTMLAudioElement.prototype.setSinkId === 'undefined') {
+            speakerSelect.disabled = true;
+            speakerSelect.innerHTML = '<option value="">الافتراضي</option>';
+            speakerWarning.style.display = 'block';
+        } else {
+            speakerWarning.style.display = 'none';
+            if(speakers.length === 0) speakerSelect.innerHTML = '<option value="">الافتراضي</option>';
+            speakers.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.deviceId; opt.text = d.label || `سماعة ${speakerSelect.length + 1}`;
+                if (d.deviceId === selectedSpeakerId) opt.selected = true;
+                speakerSelect.appendChild(opt);
+            });
+        }
     } catch(e) {}
 }
 
@@ -181,10 +206,24 @@ async function switchMicrophone(deviceId) {
         const newTrack = newStream.getAudioTracks()[0];
         if(localStream) { localStream.removeTrack(localStream.getAudioTracks()[0]); localStream.addTrack(newTrack); } else { localStream = newStream; }
         newTrack.enabled = !isMuted;
+        
         Object.values(peerConnections).forEach(pc => { const sender = pc.getSenders().find(s => s.track && s.track.kind === 'audio'); if(sender) sender.replaceTrack(newTrack); });
-        detectLocalSpeaking(localStream, roomId ? `card_${currentUser.uid}` : 'micPreview');
+        
+        startVisualizer(localStream, roomId ? `card_${currentUser.uid}` : 'micPreview', true);
         showToast("تم تغيير المايك", "success");
     } catch (e) { showToast("فشل التغيير", "error"); }
+}
+
+async function switchSpeaker(deviceId) {
+    if(!deviceId) return;
+    selectedSpeakerId = deviceId;
+    const audios = document.querySelectorAll('audio');
+    audios.forEach(async (audio) => {
+        if (typeof audio.setSinkId !== 'undefined') {
+            try { await audio.setSinkId(deviceId); } catch (e) {}
+        }
+    });
+    showToast("تم تغيير مخرج الصوت", "success");
 }
 
 async function togglePreJoinMic() {
@@ -199,7 +238,7 @@ function updatePreJoinMicUI() {
     else { preview.classList.add('active'); preview.classList.remove('muted'); preview.innerHTML = '<i class="fa-solid fa-microphone"></i>'; preBtn.innerHTML = '<i class="fa-solid fa-microphone-slash"></i> اكتم المايك'; }
 }
 
-// ================= ROOM MANAGEMENT & JOIN =================
+// ================= ROOM MANAGEMENT =================
 async function createRoom() {
     const name = document.getElementById('roomNameInput').value.trim() || "قعدة رايقة";
     const privacy = document.getElementById('roomPrivacy').value;
@@ -254,7 +293,7 @@ function enterRoomInterface() {
     connectToPeers();
     setupChatListeners();
 
-    if (localStream && !isMuted) detectLocalSpeaking(localStream, `card_${currentUser.uid}`);
+    if (localStream && !isMuted) startVisualizer(localStream, `card_${currentUser.uid}`, true);
 }
 
 function setupRoomListeners() {
@@ -264,23 +303,16 @@ function setupRoomListeners() {
         roomData = data;
         isRoomAdmin = (currentUser.uid === data.adminId);
         
-        // Update Room Name
         document.getElementById('rNameText').innerText = data.name;
-
         const privBadge = document.getElementById('roomPrivacyBadge');
         const adminSelect = document.getElementById('adminPrivacySelect');
 
-        // Manage UI for Admin Dropdown vs Normal Badge
         if (isRoomAdmin) {
-            privBadge.style.display = 'none';
-            adminSelect.style.display = 'flex';
-            adminSelect.value = data.privacy;
-            
+            privBadge.style.display = 'none'; adminSelect.style.display = 'flex'; adminSelect.value = data.privacy;
             document.getElementById('requestsTabBtn').style.display = data.privacy === 'private' ? 'block' : 'none';
             listenToRequests();
         } else {
-            adminSelect.style.display = 'none';
-            privBadge.style.display = 'flex';
+            adminSelect.style.display = 'none'; privBadge.style.display = 'flex';
             privBadge.innerHTML = data.privacy === 'private' ? '<i class="fa-solid fa-lock"></i> خاصة' : '<i class="fa-solid fa-globe"></i> عامة';
         }
     });
@@ -294,16 +326,14 @@ function setupRoomListeners() {
         updateParticipantsUI(participants);
 
         const me = participants[currentUser.uid];
-        if(!me) { showToast("تم طردك من الغرفة.", "error"); setTimeout(() => window.location.href = 'dashboard.html', 1500); return; }
+        if(!me) { showToast("تم طردك.", "error"); setTimeout(() => window.location.href = 'dashboard.html', 1500); return; }
         
         if (me.forceMuted && !isMuted) {
             enforceMute();
         } else if (me.unmuteTrigger && me.unmuteTrigger > lastUnmuteTrigger) {
-            lastUnmuteTrigger = me.unmuteTrigger;
-            isMuted = false;
+            lastUnmuteTrigger = me.unmuteTrigger; isMuted = false;
             if(localStream) localStream.getAudioTracks()[0].enabled = true;
-            updateActiveMicUI();
-            showToast("المعلم سمحلك تتكلم 🎙️", "success");
+            updateActiveMicUI(); showToast("المعلم سمحلك تتكلم 🎙️", "success");
         }
     });
 }
@@ -311,43 +341,35 @@ function setupRoomListeners() {
 function listenToRequests() {
     if(isListeningRequests) return;
     isListeningRequests = true;
-
     onValue(ref(rtdb, `rooms/${roomId}/requests`), snap => {
-        const reqs = snap.val() || {};
-        const pending = Object.entries(reqs).filter(([_, r]) => r.status === 'pending');
-        
-        const badge = document.getElementById('requestAlertBadge');
-        const countBadge = document.getElementById('reqCountBadge');
-        const requestsTab = document.getElementById('requestsTab');
+        const reqs = snap.val() || {}; const pending = Object.entries(reqs).filter(([_, r]) => r.status === 'pending');
+        const badge = document.getElementById('requestAlertBadge'); const countBadge = document.getElementById('reqCountBadge'); const requestsTab = document.getElementById('requestsTab');
         
         if(pending.length > 0) {
-            badge.style.display = 'flex'; countBadge.innerText = `(${pending.length})`;
-            requestsTab.innerHTML = '';
+            badge.style.display = 'flex'; countBadge.innerText = `(${pending.length})`; requestsTab.innerHTML = '';
             pending.forEach(([uid, r]) => {
                 const div = document.createElement('div'); div.className = 'user-list-item';
-                div.innerHTML = `
-                    <div class="user-list-info"><img src="${r.photo}"><span>${r.name}</span></div>
+                div.innerHTML = `<div class="user-list-info"><img src="${r.photo}"><span>${r.name}</span></div>
                     <div class="user-list-actions">
-                        <button class="action-btn accept" onclick="window.handleReq('${uid}', 'accepted')" title="موافقة"><i class="fa-solid fa-check"></i></button>
-                        <button class="action-btn kick" onclick="window.handleReq('${uid}', 'declined')" title="رفض"><i class="fa-solid fa-xmark"></i></button>
+                        <button class="action-btn accept" onclick="window.handleReq('${uid}', 'accepted')"><i class="fa-solid fa-check"></i></button>
+                        <button class="action-btn kick" onclick="window.handleReq('${uid}', 'declined')"><i class="fa-solid fa-xmark"></i></button>
                     </div>`;
                 requestsTab.appendChild(div);
             });
         } else {
             badge.style.display = 'none'; countBadge.innerText = '';
-            requestsTab.innerHTML = '<p style="text-align:center; color:gray; font-size:0.9rem;">مفيش طلبات حاليا</p>';
+            requestsTab.innerHTML = '<p style="text-align:center; color:gray; font-size:0.9rem;">مفيش طلبات</p>';
         }
     });
 }
 
 window.handleReq = (uid, status) => { update(ref(rtdb, `rooms/${roomId}/requests/${uid}`), { status: status }); }
-window.adminMute = (uid) => { update(ref(rtdb, `rooms/${roomId}/participants/${uid}`), { forceMuted: true, isMuted: true }); showToast("سحبت منه المايك", "success"); }
-window.adminUnmute = (uid) => { update(ref(rtdb, `rooms/${roomId}/participants/${uid}`), { forceMuted: false, isMuted: false, unmuteTrigger: Date.now() }); showToast("سمحتله يتكلم", "success"); }
-window.adminKick = (uid) => { remove(ref(rtdb, `rooms/${roomId}/participants/${uid}`)); set(ref(rtdb, `rooms/${roomId}/kicked/${uid}`), true); showToast("طردته لبره", "success"); }
+window.adminMute = (uid) => { update(ref(rtdb, `rooms/${roomId}/participants/${uid}`), { forceMuted: true, isMuted: true }); }
+window.adminUnmute = (uid) => { update(ref(rtdb, `rooms/${roomId}/participants/${uid}`), { forceMuted: false, isMuted: false, unmuteTrigger: Date.now() }); }
+window.adminKick = (uid) => { remove(ref(rtdb, `rooms/${roomId}/participants/${uid}`)); set(ref(rtdb, `rooms/${roomId}/kicked/${uid}`), true); }
 
 function updateParticipantsUI(participants) {
-    const grid = document.getElementById('participantsGrid');
-    const usersTab = document.getElementById('usersTab');
+    const grid = document.getElementById('participantsGrid'); const usersTab = document.getElementById('usersTab');
     document.getElementById('participantsCount').innerText = Object.keys(participants).length;
     
     Array.from(grid.children).forEach(c => { if (!participants[c.id.replace('card_','')]) c.remove(); });
@@ -359,14 +381,13 @@ function updateParticipantsUI(participants) {
         
         let card = document.getElementById(`card_${uid}`);
         if (!card) { card = document.createElement('div'); card.className = 'participant-card'; card.id = `card_${uid}`; grid.appendChild(card); }
-        card.innerHTML = `<div class="mic-status-icon ${micClass}">${micIcon}</div><img src="${p.photo}"><div class="participant-name">${p.name} ${isMe ? '(أنت)' : ''}</div>`;
+        card.innerHTML = `<div class="mic-status-icon ${micClass}">${micIcon}</div><img src="${p.photo}"><div class="participant-name">${p.name}</div>`;
 
         let adminHtml = '';
         if (isRoomAdmin && !isMe) {
             const muteAction = p.isMuted 
                 ? `<button class="action-btn unmute" onclick="window.adminUnmute('${uid}')" title="فك الميوت"><i class="fa-solid fa-microphone"></i></button>`
                 : `<button class="action-btn mute" onclick="window.adminMute('${uid}')" title="اسحب المايك"><i class="fa-solid fa-microphone-slash"></i></button>`;
-            
             adminHtml = `<div class="user-list-actions">${muteAction}<button class="action-btn kick" onclick="window.adminKick('${uid}')" title="طرد"><i class="fa-solid fa-ban"></i></button></div>`;
         }
         usersTab.innerHTML += `<div class="user-list-item"><div class="user-list-info"><img src="${p.photo}"> <span>${p.name} ${isMe?'(أنت)':''} ${uid === roomData?.adminId ? '<i class="fa-solid fa-crown" style="color:#f1c40f;"></i>':''}</span></div>${adminHtml}</div>`;
@@ -377,14 +398,14 @@ function enforceMute() {
     isMuted = true;
     if(localStream) localStream.getAudioTracks()[0].enabled = false;
     updateActiveMicUI();
-    showToast("المعلم سحب منك المايك!", "error");
+    showToast("المعلم سحب المايك!", "error");
     update(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}`), { isMuted: true });
 }
 
 async function toggleMainMic() {
-    if (!localStream && isMuted) { const ok = await requestMicPermission(selectedMicId); if(!ok) { showToast("أعطي صلاحية المايك من المتصفح.", "error"); return; } }
+    if (!localStream && isMuted) { const ok = await requestMicPermission(selectedMicId); if(!ok) return; }
     get(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}/forceMuted`)).then(snap => {
-        if (snap.val() === true) { showToast("ممنوع تفتح المايك.. المعلم سحبه.", "error"); return; }
+        if (snap.val() === true) { showToast("ممنوع تفتح المايك.", "error"); return; }
         isMuted = !isMuted;
         if (localStream) localStream.getAudioTracks()[0].enabled = !isMuted;
         update(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}`), { isMuted: isMuted });
@@ -395,10 +416,10 @@ async function toggleMainMic() {
 function updateActiveMicUI() {
     const btn = document.getElementById('toggleMicBtn'); if(!btn) return;
     if (isMuted) { btn.classList.add('muted'); btn.innerHTML = '<i class="fa-solid fa-microphone-slash"></i>'; } 
-    else { btn.classList.remove('muted'); btn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; if(localStream) detectLocalSpeaking(localStream, `card_${currentUser.uid}`); }
+    else { btn.classList.remove('muted'); btn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; if(localStream) startVisualizer(localStream, `card_${currentUser.uid}`, true); }
 }
 
-// ================= WEBRTC MESH =================
+// ================= WEBRTC MESH & AUDIO =================
 function connectToPeers() {
     onValue(ref(rtdb, `rooms/${roomId}/participants`), (snap) => {
         Object.keys(snap.val() || {}).forEach(uid => { if (uid !== currentUser.uid && !peerConnections[uid]) initiateCall(uid); });
@@ -417,11 +438,29 @@ function connectToPeers() {
 function createPeerConnection(targetUid) {
     const pc = new RTCPeerConnection(ICE_SERVERS);
     if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    
     pc.ontrack = (event) => {
         let audioEl = document.getElementById(`audio_${targetUid}`);
-        if (!audioEl) { audioEl = document.createElement('audio'); audioEl.id = `audio_${targetUid}`; audioEl.autoplay = true; document.body.appendChild(audioEl); }
-        audioEl.srcObject = event.streams[0]; detectRemoteSpeaking(event.streams[0], targetUid);
+        if (!audioEl) { 
+            audioEl = document.createElement('audio'); 
+            audioEl.id = `audio_${targetUid}`; 
+            audioEl.autoplay = true; 
+            document.body.appendChild(audioEl); 
+        }
+        audioEl.srcObject = event.streams[0];
+        
+        // Output device
+        if (typeof audioEl.setSinkId !== 'undefined' && selectedSpeakerId !== 'default') {
+            audioEl.setSinkId(selectedSpeakerId).catch(()=>{});
+        }
+        
+        // Force play logic to bypass browser autoplay blocks
+        audioEl.play().catch(e => console.warn("Autoplay block for remote user:", targetUid));
+        
+        // Start remote visualizer
+        startVisualizer(event.streams[0], `card_${targetUid}`, false);
     };
+
     pc.onicecandidate = (e) => { if (e.candidate) push(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/ice_candidates`), e.candidate.toJSON()); };
     pc.onconnectionstatechange = () => { if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') { document.getElementById(`audio_${targetUid}`)?.remove(); delete peerConnections[targetUid]; } };
     peerConnections[targetUid] = pc; return pc;
@@ -429,6 +468,56 @@ function createPeerConnection(targetUid) {
 
 async function initiateCall(targetUid) { const pc = createPeerConnection(targetUid); const offer = await pc.createOffer(); await pc.setLocalDescription(offer); await set(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/offer`), { type: offer.type, sdp: offer.sdp }); }
 async function answerCall(targetUid, offerData) { const pc = createPeerConnection(targetUid); await pc.setRemoteDescription(new RTCSessionDescription(offerData)); const answer = await pc.createAnswer(); await pc.setLocalDescription(answer); await update(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}`), { answer: { type: answer.type, sdp: answer.sdp } }); }
+
+// ================= MODERN VISUALIZER =================
+function startVisualizer(stream, targetId, isLocal) {
+    if (!stream) return;
+    
+    if (activeVisualizers[targetId]) {
+        cancelAnimationFrame(activeVisualizers[targetId].frameId);
+        if(activeVisualizers[targetId].ctx) activeVisualizers[targetId].ctx.close();
+    }
+
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioCtx.createAnalyser();
+        analyser.smoothingTimeConstant = 0.8;
+        analyser.fftSize = 256;
+
+        const src = audioCtx.createMediaStreamSource(stream);
+        src.connect(analyser); // We do NOT connect to destination to avoid echo
+
+        const array = new Uint8Array(analyser.frequencyBinCount);
+
+        function update() {
+            if (isLocal && isMuted) {
+                const el = document.getElementById(targetId);
+                if (el) el.classList.remove('active', 'speaking');
+                activeVisualizers[targetId].frameId = requestAnimationFrame(update);
+                return;
+            }
+
+            analyser.getByteFrequencyData(array);
+            let values = 0;
+            for (let i = 0; i < array.length; i++) values += array[i];
+            const avg = values / array.length;
+
+            const el = document.getElementById(targetId);
+            if (el) {
+                if (avg > 15) {
+                    el.classList.add('speaking');
+                    if(isLocal) el.classList.add('active'); // For lobby circle
+                } else {
+                    el.classList.remove('speaking');
+                    if(isLocal) el.classList.remove('active');
+                }
+            }
+            activeVisualizers[targetId].frameId = requestAnimationFrame(update);
+        }
+        
+        activeVisualizers[targetId] = { ctx: audioCtx, frameId: requestAnimationFrame(update) };
+    } catch(e) { console.warn("Visualizer Error", e); }
+}
 
 // ================= CHAT =================
 function setupChatListeners() {
@@ -452,16 +541,14 @@ function openLeaveModal() {
     const btnContainer = document.getElementById('leaveModalButtons');
     
     if (isRoomAdmin) {
-        title.innerText = "خيارات المغادرة";
-        text.innerText = "أنت المعلم. عايز تقفل الغرفة خالص على الكل، ولا تسيبهم وتخرج أنت بس؟";
+        title.innerText = "خيارات المغادرة"; text.innerText = "أنت المعلم. عايز تقفل الغرفة خالص على الكل، ولا تسيبهم وتخرج أنت بس؟";
         btnContainer.innerHTML = `
             <button class="btn-action btn-cancel close-modal-btn" data-target="leaveModal" style="flex: 1; min-width: 100px;">إلغاء</button>
             <button class="btn-action btn-warning" onclick="window.executeLeave('leave_only')" style="flex: 1; min-width: 100px;">مغادرة فقط</button>
             <button class="btn-action btn-danger" onclick="window.executeLeave('close_all')" style="flex: 1; min-width: 100px;">إنهاء للجميع</button>
         `;
     } else {
-        title.innerText = "هتمشي؟";
-        text.innerText = "متأكد إنك عايز تسيب الغرفة؟";
+        title.innerText = "هتمشي؟"; text.innerText = "متأكد إنك عايز تسيب الغرفة؟";
         btnContainer.innerHTML = `
             <button class="btn-action btn-cancel close-modal-btn" data-target="leaveModal" style="flex: 1;">لا، هكمل</button>
             <button class="btn-action btn-danger" onclick="window.executeLeave('leave_only')" style="flex: 1;">سلام</button>
@@ -471,41 +558,11 @@ function openLeaveModal() {
     document.querySelectorAll('.close-modal-btn').forEach(btn => {
         btn.addEventListener('click', (e) => document.getElementById(e.currentTarget.getAttribute('data-target')).classList.remove('active'));
     });
-
     document.getElementById('leaveModal').classList.add('active');
 }
 
 window.executeLeave = (type) => { 
-    if (type === 'close_all' && isRoomAdmin) {
-        remove(ref(rtdb, `rooms/${roomId}`));
-    } else {
-        remove(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}`));
-    }
+    if (type === 'close_all' && isRoomAdmin) remove(ref(rtdb, `rooms/${roomId}`));
+    else remove(ref(rtdb, `rooms/${roomId}/participants/${currentUser.uid}`));
     window.location.href = 'dashboard.html'; 
-}
-
-// ================= VISUALIZERS =================
-function detectLocalSpeaking(stream, targetId) {
-    if(!stream || isMuted) return;
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const analyser = audioCtx.createAnalyser(); const src = audioCtx.createMediaStreamSource(stream); const scriptNode = audioCtx.createScriptProcessor(2048, 1, 1);
-        analyser.smoothingTimeConstant = 0.8; analyser.fftSize = 512; src.connect(analyser); analyser.connect(scriptNode); scriptNode.connect(audioCtx.destination);
-        if(localAnalyserInterval) clearInterval(localAnalyserInterval);
-        scriptNode.onaudioprocess = () => {
-            if(isMuted) return; const array = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(array);
-            let values = 0; for (let i = 0; i < array.length; i++) values += array[i]; const avg = values / array.length;
-            const el = document.getElementById(targetId); if (el) { if (avg > 15) el.classList.add('active', 'speaking'); else el.classList.remove('active', 'speaking'); }
-        };
-    } catch(e) {}
-}
-function detectRemoteSpeaking(stream, uid) {
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const analyser = audioCtx.createAnalyser(); const src = audioCtx.createMediaStreamSource(stream); const scriptNode = audioCtx.createScriptProcessor(2048, 1, 1);
-        analyser.smoothingTimeConstant = 0.8; analyser.fftSize = 512; src.connect(analyser); analyser.connect(scriptNode); scriptNode.connect(audioCtx.destination);
-        scriptNode.onaudioprocess = () => {
-            const array = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(array);
-            let values = 0; for (let i = 0; i < array.length; i++) values += array[i]; const avg = values / array.length;
-            const card = document.getElementById(`card_${uid}`); if (card) { if (avg > 10) card.classList.add('speaking'); else card.classList.remove('speaking'); }
-        }
-    } catch(e) {}
 }

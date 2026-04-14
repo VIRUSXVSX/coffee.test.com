@@ -10,7 +10,7 @@
     <script src="theme.js"></script>
     <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
     <style>
-        /* Base Full-Screen Setup */
+/* Base Full-Screen Setup */
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Tajawal', sans-serif; background: #0f0f11; }
         
         .glass-nav { z-index: 1000; position: fixed; width: 100%; top: 0; left: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -177,7 +177,7 @@
         <div class="lobby-card">
             <div class="spinner"></div>
             <h3 style="color: var(--primary-blue); margin-bottom: 10px;">في انتظار موافقة المعلم...</h3>
-            <p style="color: var(--text-grey); font-size: 0.9rem; margin-bottom: 20px;">الغرفة دي خاصة أو تم طردك قبل كده، طلبك وصل للمعلم وفي انتظار قبوله.</p>
+            <p style="color: var(--text-grey); font-size: 0.9rem; margin-bottom: 20px;">طلبك وصل للمعلم وفي انتظار قبوله.</p>
             <button class="btn-outline" onclick="window.location.href='dashboard.html'" style="border-radius: 20px;">رجوع للصالة</button>
         </div>
     </div>
@@ -187,9 +187,7 @@
             <div class="stage-header">
                 <div style="display: flex; gap: 10px;">
                     <div class="room-badge" id="roomNameBadge"><i class="fa-solid fa-house"></i> <span id="rNameText"></span></div>
-                    
                     <div class="room-badge" id="roomPrivacyBadge" style="display: none;"></div>
-                    
                     <select class="room-badge" id="adminPrivacySelect" style="display: none;" title="تغيير الخصوصية">
                         <option value="public">🌍 عامة</option>
                         <option value="private">🔒 خاصة</option>
@@ -218,9 +216,7 @@
                 <h3 style="margin: 0; color: var(--primary-blue);"><i class="fa-regular fa-comments"></i> اللمة</h3>
                 <button class="btn-outline" id="closeChatBtn" style="border: none; padding: 5px 10px; border-radius: 10px;"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="chat-area" id="roomChatArea">
-                <div style="text-align: center; color: var(--text-grey); font-size: 0.8rem; margin: 10px 0;">الشات مؤقت.</div>
-            </div>
+            <div class="chat-area" id="roomChatArea"></div>
             <div class="chat-input-box">
                 <input type="text" id="roomChatInput" placeholder="اكتب رسالة..." autocomplete="off">
                 <button id="sendRoomChatBtn"><i class="fa-solid fa-paper-plane"></i></button>
@@ -232,7 +228,7 @@
         <div class="modal-box">
             <div class="modal-header">
                 <h3 style="margin: 0; color: var(--primary-blue);">الناس اللي في القعدة</h3>
-                <button class="close-modal-btn" data-target="participantsModal" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-dark);"><i class="fa-solid fa-xmark"></i></button>
+                <button class="close-modal-btn" data-target="participantsModal" style="background: none; border: none; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-tabs">
                 <button class="tab-btn active" data-tab="usersTab">المتواجدون</button>
@@ -248,12 +244,16 @@
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3 style="margin: 0; color: var(--primary-blue);">الإعدادات</h3>
-                <button class="close-modal-btn" data-target="settingsModal" style="background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-dark);"><i class="fa-solid fa-xmark"></i></button>
+                <h3 style="margin: 0; color: var(--primary-blue);">إعدادات الصوت</h3>
+                <button class="close-modal-btn" data-target="settingsModal" style="background: none; border: none; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
-                <p style="color: var(--text-grey); font-size: 0.9rem; margin-bottom: 15px;">اختار المايك اللي حابب تستخدمه:</p>
-                <select id="micSelect" class="form-input" style="width: 100%; border-radius: 12px; margin-bottom: 10px;"><option value="">جاري البحث...</option></select>
+                <p style="color: var(--text-grey); font-size: 0.9rem; margin-bottom: 5px;">المايك (الميكروفون):</p>
+                <select id="micSelect" class="form-input" style="width: 100%; border-radius: 12px; margin-bottom: 15px;"></select>
+                
+                <p style="color: var(--text-grey); font-size: 0.9rem; margin-bottom: 5px;">السماعة (مخرج الصوت):</p>
+                <select id="speakerSelect" class="form-input" style="width: 100%; border-radius: 12px; margin-bottom: 10px;"></select>
+                <p style="font-size: 0.75rem; color: #f39c12; display: none;" id="speakerWarning">متصفحك لا يدعم تغيير مخرج الصوت.</p>
             </div>
         </div>
     </div>
@@ -262,7 +262,7 @@
         <div class="modal-box" style="text-align: center; padding-bottom: 20px;">
             <div style="background: #fce8e6; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 20px auto 10px;"><i class="fa-solid fa-right-from-bracket fa-2x" style="color: #ea4335;"></i></div>
             <h3 id="leaveModalTitle" style="margin-bottom: 10px;">خيارات المغادرة</h3>
-            <p id="leaveModalText" style="color: var(--text-grey); font-size: 0.95rem; margin-bottom: 20px; padding: 0 20px;">اختار عايز تعمل إيه بالظبط؟</p>
+            <p id="leaveModalText" style="color: var(--text-grey); font-size: 0.95rem; margin-bottom: 20px; padding: 0 20px;"></p>
             <div id="leaveModalButtons" style="display: flex; gap: 10px; justify-content: center; padding: 0 20px; flex-wrap: wrap;"></div>
         </div>
     </div>
