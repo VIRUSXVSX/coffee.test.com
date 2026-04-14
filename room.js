@@ -422,53 +422,69 @@ function updateActiveMicUI() {
 // ================= WEBRTC MESH & AUDIO =================
 function connectToPeers() {
     onValue(ref(rtdb, `rooms/${roomId}/participants`), (snap) => {
-        Object.keys(snap.val() || {}).forEach(uid => { if (uid !== currentUser.uid && !peerConnections[uid]) initiateCall(uid); });
+        const participants = snap.val() || {};
+
+        // FIX 1: Cleanup disconnected peers
+        // If someone leaves or refreshes, we must destroy their WebRTC connection and audio element
+        Object.keys(peerConnections).forEach(uid => {
+            if (!participants[uid]) {
+                peerConnections[uid].close();
+                delete peerConnections[uid];
+                const audioEl = document.getElementById(`audio_${uid}`);
+                if (audioEl) audioEl.remove();
+            }
+        });
+
+        // FIX 2: Prevent WebRTC Glare
+        Object.keys(participants).forEach(uid => {
+            if (uid !== currentUser.uid && !peerConnections[uid]) {
+                // By comparing UIDs, we force ONLY ONE user to be the caller.
+                // The other user will naturally wait to receive the offer, perfectly completing the handshake.
+                if (currentUser.uid < uid) {
+                    initiateCall(uid);
+                }
+            }
+        });
     });
+
     onValue(ref(rtdb, `rooms/${roomId}/signaling/${currentUser.uid}`), (snap) => {
         const data = snap.val(); if (!data) return;
         Object.keys(data).forEach(async (senderUid) => {
             const signal = data[senderUid];
             if (signal.offer && !peerConnections[senderUid]) await answerCall(senderUid, signal.offer);
-            if (signal.answer && peerConnections[senderUid]) { const pc = peerConnections[senderUid]; if (pc.signalingState !== "stable") await pc.setRemoteDescription(new RTCSessionDescription(signal.answer)); }
-            if (signal.ice_candidates && peerConnections[senderUid] && peerConnections[senderUid].remoteDescription) { Object.values(signal.ice_candidates).forEach(async (c) => { try { await peerConnections[senderUid].addIceCandidate(new RTCIceCandidate(c)); } catch(e){} }); }
+            if (signal.answer && peerConnections[senderUid]) { 
+                const pc = peerConnections[senderUid]; 
+                if (pc.signalingState !== "stable") await pc.setRemoteDescription(new RTCSessionDescription(signal.answer)); 
+            }
+            if (signal.ice_candidates && peerConnections[senderUid] && peerConnections[senderUid].remoteDescription) { 
+                Object.values(signal.ice_candidates).forEach(async (c) => { 
+                    try { await peerConnections[senderUid].addIceCandidate(new RTCIceCandidate(c)); } catch(e){} 
+                }); 
+            }
         });
     });
 }
 
-function createPeerConnection(targetUid) {
-    const pc = new RTCPeerConnection(ICE_SERVERS);
-    if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-    
-    pc.ontrack = (event) => {
-        let audioEl = document.getElementById(`audio_${targetUid}`);
-        if (!audioEl) { 
-            audioEl = document.createElement('audio'); 
-            audioEl.id = `audio_${targetUid}`; 
-            audioEl.autoplay = true; 
-            document.body.appendChild(audioEl); 
-        }
-        audioEl.srcObject = event.streams[0];
-        
-        // Output device
-        if (typeof audioEl.setSinkId !== 'undefined' && selectedSpeakerId !== 'default') {
-            audioEl.setSinkId(selectedSpeakerId).catch(()=>{});
-        }
-        
-        // Force play logic to bypass browser autoplay blocks
-        audioEl.play().catch(e => console.warn("Autoplay block for remote user:", targetUid));
-        
-        // Start remote visualizer
-        startVisualizer(event.streams[0], `card_${targetUid}`, false);
-    };
+async function initiateCall(targetUid) { 
+    // FIX 3: Clear old signaling data from previous sessions before starting a new call
+    await remove(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}`));
 
-    pc.onicecandidate = (e) => { if (e.candidate) push(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/ice_candidates`), e.candidate.toJSON()); };
-    pc.onconnectionstatechange = () => { if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') { document.getElementById(`audio_${targetUid}`)?.remove(); delete peerConnections[targetUid]; } };
-    peerConnections[targetUid] = pc; return pc;
+    const pc = createPeerConnection(targetUid); 
+    const offer = await pc.createOffer(); 
+    await pc.setLocalDescription(offer); 
+    await set(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/offer`), { type: offer.type, sdp: offer.sdp }); 
 }
 
-async function initiateCall(targetUid) { const pc = createPeerConnection(targetUid); const offer = await pc.createOffer(); await pc.setLocalDescription(offer); await set(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/offer`), { type: offer.type, sdp: offer.sdp }); }
-async function answerCall(targetUid, offerData) { const pc = createPeerConnection(targetUid); await pc.setRemoteDescription(new RTCSessionDescription(offerData)); const answer = await pc.createAnswer(); await pc.setLocalDescription(answer); await update(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}`), { answer: { type: answer.type, sdp: answer.sdp } }); }
+async function answerCall(targetUid, offerData) { 
+    // FIX 4: Clear old signaling data before answering to prevent stale ICE candidates
+    await remove(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}`));
 
+    const pc = createPeerConnection(targetUid); 
+    await pc.setRemoteDescription(new RTCSessionDescription(offerData)); 
+    const answer = await pc.createAnswer(); 
+    await pc.setLocalDescription(answer); 
+    await set(ref(rtdb, `rooms/${roomId}/signaling/${targetUid}/${currentUser.uid}/answer`), { type: answer.type, sdp: answer.sdp }); 
+}
 // ================= MODERN VISUALIZER =================
 function startVisualizer(stream, targetId, isLocal) {
     if (!stream) return;
