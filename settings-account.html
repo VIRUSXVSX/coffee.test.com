@@ -22,9 +22,15 @@
         </div>
         <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
     <ul class="nav-links">
-    <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+    <!-- <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
     <li><a href="dashboard.html" ><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
-    <li><a href="profile.html"><i class="fa-solid fa-user"></i> حسابي</a></li>
+    <li><a href="profile.html"><i class="fa-solid fa-user"></i> حسابي</a></li> -->
+        <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+    <li><a href="dashboard.html" class=""><i class="fa-solid fa-mug-hot"></i> الصالة</a></li>
+        <li><a href="search.html" class=""><i class="fa-solid fa-magnifying-glass"></i> الاستعلامات</a></li>
+    <!-- <li><a href="fadfada.html"><i class="fa-solid fa-user-secret"></i> بير الأسرار</a></li> -->
+    <li><a href="games.html"><i class="fa-solid fa-gamepad"></i> الألعاب</a></li>
+    <!-- <li><a href="tv.html"><i class="ri-tv-line"></i> السينما</a></li> -->
 </ul>
         <div class="nav-right" id="navAuth"></div>
     </nav>
@@ -68,7 +74,6 @@
                 
                 <h1 style="margin-bottom:1.5rem; color: var(--primary-blue);">تعديل بياناتك</h1>
 
-                <!-- Personal Info Section -->
                 <div class="settings-section">
                     <h2><i class="fa-solid fa-id-card"></i> البيانات الشخصية</h2>
                     <form id="personalInfoForm">
@@ -83,7 +88,6 @@
                             </div>
                         </div>
                         
-                        <!-- NEW: Signature Drink Selection -->
                         <div class="form-group" style="background: rgba(255, 193, 7, 0.1); padding: 10px; border-radius: 8px; border: 1px dashed #ffc107;">
                             <label for="signatureDrink" style="color: #d39e00; font-weight: bold;">
                                 <i class="fa-solid fa-mug-hot"></i> مشروب المزاج (هيظهر جنب اسمك)
@@ -131,7 +135,6 @@
                     </form>
                 </div>
 
-                <!-- Security Section -->
                 <div class="settings-section">
                     <h2><i class="fa-solid fa-shield-halved"></i> الأمان والخصوصية</h2>
                     <p style="color: var(--text-grey); margin-bottom: 1rem;">عايز تغير الباسورد عشان نسيتوا ولا عشان خايف من المدام؟ 😉</p>
@@ -142,7 +145,6 @@
                     </button>
                 </div>
 
-                <!-- Danger Zone -->
                 <div class="settings-section" style="border: 1px solid #c5221f;">
                     <h2 style="color: #c5221f;">
                         <i class="fa-solid fa-triangle-exclamation"></i> منطقة الخطر
@@ -159,47 +161,112 @@
                 </div>
                 
             </main>
+            <br>
         </div>
     </div>
 
-    <!-- Image Selection Modal -->
     <div id="imageModal" class="modal" style="display: none;">
-        <div class="modal-content" style="text-align: right;">
-            <div class="modal-header">
-                <h3>غير صورتك يا معلم</h3>
-            </div>
-            <div class="modal-body">
-                <div id="imageGrid" class="image-grid">
-                    <!-- Images inserted by JS -->
+        <div class="modal-content" style="text-align: right; max-width: 600px;">
+            <div class="modal-header" style="flex-direction: column; align-items: flex-start;">
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <h3>غير صورتك يا معلم</h3>
+                    <span onclick="window.closeImageModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
                 </div>
                 
-                <div id="customImageInput" style="display: none; margin-top: 15px; background: var(--bg-light); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border-color);">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary-blue);">حط لينك الصورة هنا:</label>
-                    <input type="text" id="customImageUrl" class="form-input" placeholder="https://example.com/image.jpg" style="direction: ltr;">
-                    <p style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">
-                        <i class="fa-brands fa-google-drive"></i> لو معاك لينك جوجل درايف، حطه وإحنا هنظبطه 😉
-                    </p>
-                    <p style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">
-                                            و لازم تكون عامل access اللينك anyone with link 👍
-                    </p>
-                    
-                    <div style="margin-top: 10px; text-align: center;">
-                        <img id="customImagePreview" src="images/user.png" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); display: none;">
-                        <div id="imgPreviewError" style="display:none; color: red; font-size: 0.8rem; margin-top: 5px;">
-                            <i class="fa-solid fa-triangle-exclamation"></i> الصورة مش بتحمل! اتأكد إنها Public
+                <div class="modal-tabs">
+                    <button class="tab-btn active" onclick="window.switchImageTab('default')"><i class="fa-solid fa-image"></i> الجاهز</button>
+                    <button class="tab-btn" onclick="window.switchImageTab('pinterest')"><i class="fa-brands fa-pinterest" style="color: #e60023;"></i> استكشف</button>
+                    <button class="tab-btn" onclick="window.switchImageTab('link')"><i class="fa-brands fa-google-drive"></i> درايف</button>
+                    <button class="tab-btn" onclick="window.switchImageTab('collection')"><i class="fa-solid fa-folder-open"></i> مجموعتي</button>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div id="tab-default" class="tab-content active">
+                    <div id="imageGrid" class="image-grid"></div>
+                </div>
+                
+                <div id="tab-pinterest" class="tab-content" style="display: none;">
+                    <div style="background: linear-gradient(135deg, var(--primary-blue), var(--accent-yellow)); padding: 20px; border-radius: var(--radius); margin-bottom: 20px; color: white; text-align: center;">
+                        <i class="fa-brands fa-pinterest fa-2x" style="margin-bottom: 10px;"></i>
+                        <h3 style="margin-bottom: 15px;">ابحث في بنترست</h3>
+                        
+                        <div style="display: flex; gap: 10px; max-width: 500px; margin: 0 auto;">
+                            <input type="text" id="pinterestSearchInput" 
+                                   placeholder="اكتب اللي تدور عليه... (coffee, anime, dark)" 
+                                   style="flex: 1; padding: 12px; border: none; border-radius: 25px; font-size: 1rem; text-align: right;"
+                                   onkeydown="if(event.key === 'Enter') window.openPinterestSearch()">
+                            
+                            <button onclick="window.openPinterestSearch()" 
+                                    style="background: white; color: var(--primary-blue); border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; white-space: nowrap;">
+                                <i class="fa-solid fa-search"></i> ابحث
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-light); padding: 20px; border-radius: var(--radius); margin-bottom: 20px; border: 2px dashed var(--border-color);">
+                        <h4 style="color: var(--primary-blue); margin-bottom: 15px; text-align: center;">
+                            <i class="fa-solid fa-circle-info"></i> ازاي تاخد الصورة؟
+                        </h4>
+                        <ol style="text-align: right; padding-right: 20px; line-height: 2.2; color: var(--text-grey);">
+                            <li>اكتب اللي تدور عليه في البحث فوق واضغط <strong>"ابحث"</strong></li>
+                            <li>هتفتح صفحة بنترست في تاب جديد 🔗</li>
+                            <li>دوس على الصورة اللي عجبك عشان تكبر</li>
+                            <li>كليك يمين على الصورة → <strong>"Copy Image Address"</strong> أو <strong>"نسخ عنوان الصورة"</strong></li>
+                            <li>ارجع هنا والصق اللينك في خانة <strong>"لينك جوجل درايف"</strong> تحت 👇</li>
+                        </ol>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <span style="color: var(--text-grey); font-size: 0.9rem; display: block; margin-bottom: 10px;">بحث سريع:</span>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="p-tag" onclick="window.quickPinterestSearch('coffee aesthetic')">☕ قهوة</button>
+                            <button class="p-tag" onclick="window.quickPinterestSearch('dark aesthetic')">🌙 دارك</button>
+                            <button class="p-tag" onclick="window.quickPinterestSearch('anime aesthetic')">🎨 أنمي</button>
+                            <button class="p-tag" onclick="window.quickPinterestSearch('vintage aesthetic')">🎞️ كلاسيك</button>
+                            <button class="p-tag" onclick="window.quickPinterestSearch('nature')">🌿 طبيعة</button>
+                            <button class="p-tag" onclick="window.quickPinterestSearch('minimal')">⚪ مينيمال</button>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 1rem;">
-                    <button class="btn-outline" id="cancelImageSelect" style="flex: 1;">إلغاء</button>
-                    <button class="btn-primary" id="confirmImageSelect" style="flex: 1;">حفظ الصورة</button>
+                <div id="tab-link" class="tab-content" style="display: none;">
+                    <div style="background: var(--bg-light); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border-color);">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary-blue);"> لينك جوجل درايف أو أي لينك:</label>
+                        <input type="text" id="customImageUrl" class="form-input" placeholder="https://drive.google.com/..." style="direction: ltr;">
+                                            <p style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">
+                        <i class="fa-brands fa-google-drive"></i> لو معاك لينك جوجل درايف، حطه وإحنا هنظبطه 😉
+                    </p>
+                        <p style="font-size: 0.8rem; color: var(--text-grey); margin-top: 5px;">
+                            ولازم تكون عامل access اللينك anyone with link 👍
+                        </p>
+                        <div style="margin-top: 10px; text-align: center;">
+                            <img id="customImagePreview" src="images/user.png" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); display: none; margin: 0 auto;">
+                            <div id="imgPreviewError" style="display:none; color: red; font-size: 0.8rem; margin-top: 5px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> الصورة مش بتحمل! اتأكد إنها Public
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-collection" class="tab-content" style="display: none;">
+                    <div id="collectionGrid" class="image-grid">
+                        </div>
+                    <div id="emptyCollectionMsg" style="text-align:center; color: var(--text-grey); padding: 30px; display: none;">
+                        <i class="fa-solid fa-folder-open fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                        <br>
+                        لسه مفيش صور في مجموعتك.. أي لينك درايف أو بنترست هتضيفه هيتحفظ هنا تلقائي!
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <button class="btn-outline" onclick="window.closeImageModal()" style="flex: 1;">إلغاء</button>
+                    <button class="btn-primary" id="confirmImageSelect" style="flex: 1;"><i class="fa-solid fa-check"></i> حفظ الصورة</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Password Modal -->
     <div id="passwordModal" class="modal" style="display: none;">
         <div class="modal-content" style="text-align: right;">
             <div class="modal-header">
@@ -228,7 +295,6 @@
         </div>
     </div>
 
-    <!-- Delete Account Modal -->
     <div id="deleteModal" class="modal" style="display: none;">
         <div class="modal-content" style="text-align: right;">
             <div class="modal-header">

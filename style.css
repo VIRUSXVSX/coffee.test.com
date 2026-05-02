@@ -2793,3 +2793,682 @@ selector::-webkit-scrollbar-thumb:hover {
     z-index: 5;
     mix-blend-mode: overlay;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   GLOBAL LOADER (شاشة التحميل للفايربيز)
+   ========================================= */
+.global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-light); /* بيج كريمي عشان يريح العين */
+    z-index: 99999; /* عشان يغطي على النافبار وكل حاجة */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+/* الكلاس ده اللي الجافاسكريبت هيحطه عشان يخفي اللودر */
+.global-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.coffee-loader {
+    text-align: center;
+    color: var(--primary-blue);
+}
+
+.coffee-loader i {
+    font-size: 4rem;
+    animation: float-jiggle 2s infinite ease-in-out;
+}
+
+.coffee-loader .loading-text {
+    margin-top: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    letter-spacing: 1px;
+    animation: pulse-text 1.5s infinite;
+}
+
+/* حركة الكوباية وهي بتتحرك وتتهز خفيف */
+@keyframes float-jiggle {
+    0% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(-5deg); }
+    50% { transform: translateY(0) rotate(0deg); }
+    75% { transform: translateY(-10px) rotate(5deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* حركة النص */
+@keyframes pulse-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   Post Links (الروابط جوه المشاريب والتلقيح)
+   ========================================= */
+.post-link {
+    color: var(--primary-blue); /* لون القهوة */
+    background-color: rgba(111, 78, 55, 0.08); /* خلفية خفيفة أوي */
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block; /* عشان ما يبوظش السطر */
+    transition: all 0.2s ease;
+    word-break: break-all; /* عشان لو اللينك طويل أوي يكسر السطر ومايخرجش بره الكارت */
+    font-size: 0.9em;
+}
+
+.post-link i {
+    font-size: 0.85em;
+    margin-right: 2px; /* مسافة صغيرة للأيقونة */
+}
+
+.post-link:hover {
+    background-color: var(--primary-blue);
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* =========================================
+   Smart Embeds (يوتيوب، صور، وكروت الروابط)
+   ========================================= */
+.smart-embed-container {
+    margin-top: 12px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    width: 100%;
+}
+
+/* تظبيط مقاس الصورة لو اليوزر حط لينك صورة */
+.embed-image {
+    width: 100%;
+    max-height: 350px;
+    object-fit: cover; /* أو contain لو عايز الصورة كاملة تبان */
+    display: block;
+}
+
+/* تظبيط فيديو اليوتيوب (16:9 Aspect Ratio) عشان يشتغل ع الموبايل والكمبيوتر */
+.yt-container {
+    position: relative;
+    padding-bottom: 56.25%; /* النسبة السحرية لفيديوهات اليوتيوب */
+    height: 0;
+    border: none;
+}
+.yt-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================================
+   كروت المعاينة للمواقع العادية
+   ========================================= */
+.url-preview-container {
+    margin-top: 12px;
+    width: 100%;
+}
+
+.preview-loading {
+    font-size: 0.8rem;
+    color: var(--text-grey);
+    padding: 15px;
+    background: rgba(111, 78, 55, 0.05);
+    border-radius: var(--radius);
+    text-align: center;
+    border: 1px dashed var(--border-color);
+}
+
+.preview-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    overflow: hidden;
+    text-decoration: none;
+    background: var(--bg-card);
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+}
+
+.preview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--primary-blue);
+}
+
+.preview-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.preview-info {
+    padding: 12px 15px;
+    text-align: right;
+}
+
+.preview-title {
+    font-size: 0.95rem;
+    color: var(--primary-blue);
+    margin-bottom: 5px;
+    font-weight: bold;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.preview-desc {
+    font-size: 0.8rem;
+    color: var(--text-grey);
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.preview-domain {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--text-dark);
+    text-transform: uppercase;
+    font-weight: bold;
+    opacity: 0.8;
+}
+
+.preview-domain img {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    object-fit: contain;
+}
+
+
+
+
+
+
+
+
+
+/* .drive-container {
+    border-radius: 8px;
+    background: #000;
+}
+.smart-embed-container {
+    margin-top: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 100%;
+} */
+
+
+
+/* Add this to your style.css */
+.drive-profile-style {
+    width: 100px; 
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%; /* Makes it circular like a profile pic */
+    transition: transform 0.3s ease;
+}
+
+.drive-profile-style:hover {
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+
+
+
+/* =========================================
+   Image Modal Tabs & Pinterest Style
+   ========================================= */
+.modal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 10px 15px;
+    font-weight: bold;
+    color: var(--text-grey);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+    margin-bottom: -2px;
+}
+
+.tab-btn:hover { color: var(--primary-blue); }
+
+.tab-btn.active {
+    color: var(--primary-blue);
+    border-bottom: 3px solid var(--primary-blue);
+}
+
+/* Pinterest Masonry Grid (Pure CSS) */
+.masonry-grid {
+    column-count: 3;
+    column-gap: 10px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.masonry-item {
+    break-inside: avoid;
+    margin-bottom: 10px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 3px solid transparent;
+    transition: 0.2s;
+}
+
+.masonry-item img {
+    width: 100%;
+    display: block;
+    border-radius: calc(var(--radius) - 3px);
+}
+
+.masonry-item:hover {
+    transform: scale(1.03);
+    box-shadow: var(--shadow-md);
+}
+
+.masonry-item.selected {
+    border-color: var(--primary-blue);
+    transform: scale(0.98);
+}
+
+/* Suggested Tags */
+.p-tag {
+    background: var(--bg-light);
+    color: var(--primary-blue);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid var(--border-color);
+    transition: 0.2s;
+}
+
+.p-tag:hover {
+    background: var(--primary-blue);
+    color: white;
+}
+
+@media (max-width: 600px) {
+    .masonry-grid { column-count: 2; }
+}
+
+
+
+
+
+
+
+/* Pinterest Iframe Container */
+#pinterestFrameContainer {
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+#pinterestFrame {
+    background: #fff;
+    min-height: 400px;
+}
+
+/* Loading State */
+.pinterest-loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-grey);
+}
+
+.pinterest-loading i {
+    font-size: 3rem;
+    color: var(--primary-blue);
+    margin-bottom: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+PINTEREST SECTION - MOBILE RESPONSIVE
+========================================= */
+@media (max-width: 914px) {
+  /* Pinterest Search Header - Stack vertically */
+  #tab-pinterest > div:first-child {
+    padding: 15px;
+  }
+  
+  #tab-pinterest h3 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+  
+  /* Search Input & Button Container */
+  #tab-pinterest > div:first-child > div {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  #pinterestSearchInput {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem; /* Prevents iOS zoom */
+    border-radius: 25px;
+  }
+  
+  #tab-pinterest > div:first-child button {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+  
+  /* Instructions Box */
+  #tab-pinterest > div:nth-child(2) {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  #tab-pinterest h4 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+  
+  #tab-pinterest ol {
+    font-size: 0.9rem;
+    line-height: 2;
+    padding-right: 15px;
+  }
+  
+  #tab-pinterest li {
+    margin-bottom: 8px;
+  }
+  
+  /* Quick Tags - Better wrapping */
+  #tab-pinterest > div:nth-child(3) {
+    margin-bottom: 15px;
+  }
+  
+  #tab-pinterest > div:nth-child(3) > span {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
+  #tab-pinterest > div:nth-child(3) > div {
+    gap: 6px;
+  }
+  
+  .p-tag {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    flex: 0 1 calc(50% - 6px); /* 2 tags per row */
+    text-align: center;
+  }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 480px) {
+  /* Pinterest Section */
+  #tab-pinterest > div:first-child {
+    padding: 12px;
+  }
+  
+  #tab-pinterest h3 {
+    font-size: 1.2rem;
+  }
+  
+  #pinterestSearchInput {
+    padding: 10px 12px;
+    font-size: 16px; /* Extra large to prevent iOS zoom */
+  }
+  
+  /* Instructions */
+  #tab-pinterest > div:nth-child(2) {
+    padding: 12px;
+  }
+  
+  #tab-pinterest ol {
+    font-size: 0.85rem;
+    padding-right: 12px;
+    line-height: 1.8;
+  }
+  
+  /* Tags - Full width on very small screens */
+  .p-tag {
+    flex: 0 1 100%;
+    font-size: 0.9rem;
+    padding: 8px 15px;
+  }
+  
+  /* Masonry Grid - 2 columns on mobile */
+  .masonry-grid {
+    column-count: 2;
+    column-gap: 8px;
+    max-height: 300px;
+    padding: 3px;
+  }
+  
+  .masonry-item {
+    margin-bottom: 8px;
+  }
+}
+
+/* Extra Small Devices */
+@media (max-width: 360px) {
+  .masonry-grid {
+    column-count: 2;
+    column-gap: 6px;
+  }
+  
+  #pinterestSearchInput {
+    font-size: 16px; /* Critical for iOS - prevents auto-zoom */
+  }
+}
+
+/* =========================================
+MODAL CONTENT - MOBILE OPTIMIZATION
+========================================= */
+@media (max-width: 914px) {
+  .modal-content {
+    width: 95%;
+    max-width: 95%;
+    padding: 1.5rem;
+    max-height: 95vh;
+    margin: 2.5vh auto;
+  }
+  
+  .modal-content h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Tabs - Scrollable horizontally */
+  .modal-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 5px;
+    padding-bottom: 5px;
+    margin-top: 10px;
+  }
+  
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  
+  /* Image Grid - Smaller on mobile */
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    /* max-height: 250px; */
+  }
+  
+  .image-option img {
+    height: 100px;
+  }
+  
+  /* Custom URL Input */
+  #customImageUrl {
+    font-size: 1rem;
+    padding: 10px;
+  }
+  
+  #confirmImageSelect {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+/* Very Small Screens */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1rem;
+    width: 98%;
+    max-width: 98%;
+  }
+  
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    /* max-height: 200px; */
+  }
+  
+  /* .image-option img {
+    height: 60px;
+  } */
+}
+
+
+
+
+/* --- زرار مسح الصورة من المجموعة --- */
+.delete-img-btn {
+    position: absolute;
+    top: 5px;
+    left: 5px; /* عشان تكون على الشمال فوق */
+    background: rgba(220, 53, 69, 0.85); /* أحمر شفاف شوية */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+}
+
+.delete-img-btn:hover {
+    background: #dc3545; /* أحمر صريح */
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* بنضمن إن الكارت نفسه يكون relative عشان الزرار يثبت جواه */
+.image-option {
+    position: relative;
+}
+
+
+
+
+
+
+
+
+/* منع خروج النصوص الطويلة والروابط عن الإطار في الموبايل */
+#userBio, 
+#visitUserBio, 
+.uni-content .description, 
+.comment-text,
+.ai-msg-bubble {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+
+
+
