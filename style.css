@@ -3472,3 +3472,138 @@ MODAL CONTENT - MOBILE OPTIMIZATION
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   Responsive Drink Badge (بادج المشروب)
+   ========================================= */
+.drink-badge {
+    font-size: 0.85rem;
+    background: #fff8e1;
+    color: #f57f17;
+    padding: 6px 14px;
+    border-radius: 25px;
+    
+    /* خصائص التجاوب (Responsive Fixes) */
+    display: inline-flex; 
+    align-items: center;
+    justify-content: center;
+    max-width: 100%; /* عشان مستحيل يخرج برا الشاشة */
+    box-sizing: border-box;
+    word-break: break-word;
+    white-space: normal;
+    line-height: 1.4;
+    text-align: center;
+    
+    margin-top: 10px;
+    border: 1px solid #ffe082;
+    transition: all 0.3s ease;
+}
+
+/* تظبيط اللون للثيم الليلي (عشان مايكونش فاقع زي الصورة) */
+[data-theme="dark"] .drink-badge {
+    background: rgba(245, 127, 23, 0.1); /* خلفية شفافة هادية */
+    color: #ffb74d; /* برتقالي أهدى للعين */
+    border-color: rgba(245, 127, 23, 0.3);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   Responsive Action Buttons (أزرار التفاعل في البروفايل)
+   ========================================= */
+#friendActionContainer {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.action-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    white-space: normal; /* بيمنع خروج النص برا حدود الزرار */
+    word-break: break-word;
+    padding: 10px 5px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+/* شبكة متجاوبة لزراير الأصدقاء */
+.friend-actions-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* الزرارين جنب بعض بالتساوي */
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.friend-actions-wrapper .action-btn {
+    margin-top: 0; /* الجريد هو اللي بيتحكم في المسافات هنا */
+}
+
+/* زرار حالة الصداقة */
+.friend-actions-wrapper .status-btn {
+    color: #28a745;
+    border-color: #28a745;
+}
+
+/* زرار الدردشة */
+.friend-actions-wrapper .chat-btn {
+    background-color: var(--primary-blue);
+}
+
+/* زرار مسح الصديق (بياخد العرض كامل بالأسفل) */
+.friend-actions-wrapper .unfriend-btn {
+    grid-column: 1 / -1; 
+    color: #dc3545;
+    border-color: #dc3545;
+    font-size: 0.8rem;
+    padding: 8px;
+}
+
+.friend-actions-wrapper .unfriend-btn:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
