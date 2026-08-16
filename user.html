@@ -8,6 +8,60 @@
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="images/coffee.ico" type="image/x-icon">
     <script src="theme.js"></script>
+        <style>
+        /* =========================================
+   الإصلاح النهائي لانحراف الكارت والتجاوب (Mobile Card Fix)
+   ========================================= */
+@media (max-width: 914px) {
+    /* 1. إخفاء أي مساحات وهمية بتزق الشاشة بالعرض */
+    html, body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
+
+    /* 2. تظبيط الحاوية (Container) عشان متبقاش أعرض من الموبايل */
+    .container {
+        width: 100% !important;
+        max-width: 100vw !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+    }
+
+    /* 3. إجبار التخطيط إنه يكون عمودي (فوق بعضه) بدل أعمدة */
+    .profile-layout, .dashboard-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 15px !important;
+    }
+
+    /* 4. سنترة الكارت بالظبط ومنعه من الانكماش */
+    .profile-sidebar, .filters-sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto 15px auto !important;
+        box-sizing: border-box !important;
+    }
+}
+
+/* 5. تأمين زراير التفاعل عشان متبوظش العرض (Flexbox بديل أكثر أماناً من Grid) */
+.friend-actions-wrapper {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px;
+    width: 100%;
+}
+
+.friend-actions-wrapper .action-btn {
+    flex: 1 1 calc(50% - 10px) !important; /* كل زرار ياخد نص المساحة */
+    margin: 0 !important;
+}
+
+.friend-actions-wrapper .unfriend-btn {
+    flex: 1 1 100% !important; /* الزرار الأخير ياخد العرض كامل */
+}
+    </style>
 </head>
 <body>
     <nav class="navbar">
