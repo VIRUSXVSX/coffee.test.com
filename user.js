@@ -607,14 +607,29 @@ async function loadTargetProfile() {
         // }
         // document.getElementById('headerName').innerHTML = headerName;
         // 1. نظبط الاسم في الكارت اللي على اليمين ونحط تحته البادج
-        let nameHtml = data.fullName || 'زبون مجهول';
-        if (data.signatureDrink && DRINKS_MAP[data.signatureDrink]) {
-             // استخدمنا <br> عشان البادج ينزل تحت الاسم وشكله يكون مظبوط
-             nameHtml += `<br><span style="font-size: 0.8rem; background: #fff8e1; color: #f57f17; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; border: 1px solid #ffe082;">
-                مشروبه: ${DRINKS_MAP[data.signatureDrink]}
-            </span>`;
-        }
-        document.getElementById('visitUserName').innerHTML = nameHtml;
+        
+        // let nameHtml = data.fullName || 'زبون مجهول';
+        // if (data.signatureDrink && DRINKS_MAP[data.signatureDrink]) {
+        //      // استخدمنا <br> عشان البادج ينزل تحت الاسم وشكله يكون مظبوط
+        //      nameHtml += `<br><span style="font-size: 0.8rem; background: #fff8e1; color: #f57f17; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; border: 1px solid #ffe082;">
+        //         مشروبه: ${DRINKS_MAP[data.signatureDrink]}
+        //     </span>`;
+        // }
+        // document.getElementById('visitUserName').innerHTML = nameHtml;
+
+
+
+
+let nameHtml = data.fullName || 'زبون مجهول';
+if (data.signatureDrink && DRINKS_MAP[data.signatureDrink]) {
+     nameHtml += `<br><span class="drink-badge">
+        مشروبه: ${DRINKS_MAP[data.signatureDrink]}
+    </span>`;
+}
+document.getElementById('visitUserName').innerHTML = nameHtml;
+
+
+        
         
         // 2. نخلي العنوان اللي فوق (الصفحة الشخصية لـ) اسم بس من غير البادج
         let headerName = (data.fullName || 'الزبون').split(' ')[0]; 
@@ -691,28 +706,63 @@ async function setupFriendButton() {
 
     const status = await getFriendshipStatus(targetUserId);
     
-    let btnHtml = '';
-    if (status === 'none') {
-        btnHtml = `<button id="btnAddFriend" class="btn-primary" style="width:100%; margin-top:1rem;"><i class="fa-solid fa-user-plus"></i> إضافة صديق</button>`;
-    } else if (status === 'pending_sent') {
-        btnHtml = `<button class="btn-outline" style="width:100%; margin-top:1rem; cursor:default; opacity:0.7;"><i class="fa-regular fa-clock"></i> تم إرسال الطلب</button>`;
-    } else if (status === 'pending_received') {
-        btnHtml = `<button id="btnAcceptFriend" class="btn-primary" style="width:100%; margin-top:1rem; background:green;"><i class="fa-solid fa-check"></i> اقبل الطلب</button>`;
-} else if (status === 'friends') {
-        btnHtml = `
-            <div style="margin-top:1rem; display:flex; flex-direction:column; gap:8px;">
-                <button class="btn-outline" style="width:100%; color:green; border-color:green; cursor:default;"><i class="fa-solid fa-check"></i> أصدقاء</button>
+//     let btnHtml = '';
+//     if (status === 'none') {
+//         btnHtml = `<button id="btnAddFriend" class="btn-primary" style="width:100%; margin-top:1rem;"><i class="fa-solid fa-user-plus"></i> إضافة صديق</button>`;
+//     } else if (status === 'pending_sent') {
+//         btnHtml = `<button class="btn-outline" style="width:100%; margin-top:1rem; cursor:default; opacity:0.7;"><i class="fa-regular fa-clock"></i> تم إرسال الطلب</button>`;
+//     } else if (status === 'pending_received') {
+//         btnHtml = `<button id="btnAcceptFriend" class="btn-primary" style="width:100%; margin-top:1rem; background:green;"><i class="fa-solid fa-check"></i> اقبل الطلب</button>`;
+// } else if (status === 'friends') {
+//         btnHtml = `
+//             <div style="margin-top:1rem; display:flex; flex-direction:column; gap:8px;">
+//                 <button class="btn-outline" style="width:100%; color:green; border-color:green; cursor:default;"><i class="fa-solid fa-check"></i> أصدقاء</button>
                 
-                <button id="btnChat" class="btn-primary" style="width:100%; background: var(--primary-blue);">
-                    <i class="fa-regular fa-comments"></i> دردشة
-                </button>
+//                 <button id="btnChat" class="btn-primary" style="width:100%; background: var(--primary-blue);">
+//                     <i class="fa-regular fa-comments"></i> دردشة
+//                 </button>
 
-                <button id="btnUnfriend" class="btn-outline" style="width:100%; color:red; border-color:red; font-size:0.8rem;">
-                    <i class="fa-solid fa-user-minus"></i> مسح من الشلة
-                </button>
+//                 <button id="btnUnfriend" class="btn-outline" style="width:100%; color:red; border-color:red; font-size:0.8rem;">
+//                     <i class="fa-solid fa-user-minus"></i> مسح من الشلة
+//                 </button>
+//             </div>
+//         `;
+//     }
+
+
+
+
+
+
+
+
+
+let btnHtml = '';
+    if (status === 'none') {
+        btnHtml = `<button id="btnAddFriend" class="btn-primary action-btn"><i class="fa-solid fa-user-plus"></i> إضافة صديق</button>`;
+    } else if (status === 'pending_sent') {
+        btnHtml = `<button class="btn-outline action-btn" style="cursor:default; opacity:0.7;"><i class="fa-regular fa-clock"></i> تم إرسال الطلب</button>`;
+    } else if (status === 'pending_received') {
+        btnHtml = `<button id="btnAcceptFriend" class="btn-primary action-btn" style="background:green;"><i class="fa-solid fa-check"></i> اقبل الطلب</button>`;
+    } else if (status === 'friends') {
+        btnHtml = `
+            <div class="friend-actions-wrapper">
+                <button class="btn-outline action-btn status-btn" style="cursor:default;"><i class="fa-solid fa-check"></i> أصدقاء</button>
+                <button id="btnChat" class="btn-primary action-btn chat-btn"><i class="fa-regular fa-comments"></i> دردشة</button>
+                <button id="btnUnfriend" class="btn-outline action-btn unfriend-btn"><i class="fa-solid fa-user-minus"></i> مسح من الشلة</button>
             </div>
         `;
     }
+
+
+
+
+
+
+
+
+
+    
     // } else if (status === 'friends') {
     //     btnHtml = `
     //         <div style="margin-top:1rem;">
